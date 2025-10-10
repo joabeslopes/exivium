@@ -1,0 +1,47 @@
+import asyncio
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
+from classes.reader import Reader
+from classes.resource_manager import ResourceManager
+from functions.log import log
+from functions.tokens import get_token_info
+from fastapi.middleware.cors import CORSMiddleware
+import zmq
+from functions.mjpeg import gen_frame
+
+app = FastAPI(root_path="/api")
+resource_manager = ResourceManager()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/video/{id}")
+async def mjpeg_stream(request: Request, token: str, id: int):
+    info = await get_token_info(token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    if not id in resource_manager.resources:
+        raise HTTPException(status_code=500, detail="Video nao disponivel")
+
+    reader = Reader(id)
+    return StreamingResponse(gen_frame(request, reader), media_type="multipart/x-mixed-replace; boundary=--boundary")
+
+@app.get("/recursos")
+async def get_all_cameras(token: str):
+    info = await get_token_info(token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    return resource_manager.get_all()
+
+if __name__ == 'api':
+    resource_manager.start_resource(1, "opencvcam", "camera", "0")
+    resource_manager.start_resource(2, "primeiro_plugin", "plugin", 1)

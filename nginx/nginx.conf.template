@@ -1,0 +1,60 @@
+events {}
+http {
+# HTTP
+server {
+    listen 80;
+    server_name localhost;
+
+    # Servir o diretório "frontend"
+    location / {
+        root /var/www/frontend;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # REST
+    location /api {
+        proxy_pass http://backend:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+}
+
+# Produção HTTPS
+
+# server {
+#     listen 80;
+#     server_name exemplo.com;
+
+#     # Redirecionar para HTTPS
+#     return 301 https://$host$request_uri;
+# }
+
+# server {
+#     listen 443 ssl;
+#     server_name exemplo.com;
+
+#     # Certificado SSL
+#     ssl_certificate /etc/nginx/ssl/exemplo.com.crt;
+#     ssl_certificate_key /etc/nginx/ssl/exemplo.com.key;
+
+#     # Servir o diretório "frontend"
+#     location / {
+#         root /var/www/frontend;
+#         index index.html;
+#         try_files $uri $uri/ /index.html;
+#     }
+
+#     # Proxy reverso para o backend
+#     location /api {
+#         proxy_pass http://backend:8000;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#     }
+# }
+}

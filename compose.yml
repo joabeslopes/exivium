@@ -1,0 +1,29 @@
+services:
+  redis:
+    image: redis:8.0-bookworm
+    env_file:
+      - ./redis/.env
+
+  backend:
+    build: 
+      context: "./backend"
+    image: "exivium/backend:1.0"
+    depends_on:
+      - redis
+    env_file:
+      - ./backend/.env
+    volumes:
+      - "./backend/plugins:/exivium/plugins"
+      - "./backend/cameras:/exivium/cameras"
+
+  nginx:
+    image: nginx:1.28.0-bookworm
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/var/www/frontend:ro
+      - ./nginx/ssl:/etc/nginx/ssl/:ro

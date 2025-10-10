@@ -1,0 +1,21 @@
+# Ignora os recursos instalados mas mantem a pasta base
+plugins/*
+!plugins/__init__.py
+cameras/*
+!cameras/__init__.py
+
+# Arquivos de ambiente
+.env
+.venv
+
+# Arquivos de cache
+__pycache__
+*.py[cod]
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.vscode/
+.pydevproject
