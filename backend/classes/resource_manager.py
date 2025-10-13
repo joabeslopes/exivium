@@ -67,7 +67,7 @@ class ResourceManager():
 
     def start_resource(self, id, nome, tipo, recurso_alvo, git_repo_url: str=""):
         if id in self.resources:
-            self.stop_recource(id)
+            return ""
 
         dir = self.create_dir(nome, tipo)
         if dir == "":
