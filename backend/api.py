@@ -8,6 +8,7 @@ from functions.tokens import get_token_info
 from fastapi.middleware.cors import CORSMiddleware
 import zmq
 from functions.mjpeg import gen_frame
+from classes.requests import NovoRecurso
 
 app = FastAPI(root_path="/api")
 resource_manager = ResourceManager()
@@ -42,6 +43,11 @@ async def get_all_cameras(token: str):
 
     return resource_manager.get_all()
 
-if __name__ == 'api':
-    resource_manager.start_resource(1, "opencvcam", "camera", "0")
-    resource_manager.start_resource(2, "primeiro_plugin", "plugin", 1)
+@app.post("/recurso")
+async def cria_recurso(request: NovoRecurso):
+    info = await get_token_info(request.token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    resource_manager.start_resource(request.id, request.nome, request.tipo, request.recurso_alvo)
