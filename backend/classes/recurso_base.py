@@ -23,7 +23,7 @@ class RecursoBase():
         self.send_topic = f"recurso.{self.id}.image".encode()
         self.send_socket.setsockopt(zmq.CONFLATE, 1)
         self.send_socket.setsockopt(zmq.LINGER, 0)
-        self.send_socket.setsockopt(zmq.SNDHWM, 30)
+        self.send_socket.setsockopt(zmq.SNDHWM, 2)
 
     def init_recieve_socket(self):
         self.recieve_socket = self.context.socket(zmq.SUB)
@@ -32,7 +32,7 @@ class RecursoBase():
         self.recieve_socket.setsockopt(zmq.SUBSCRIBE, self.recieve_topic)
         self.recieve_socket.setsockopt(zmq.CONFLATE, 1)
         self.recieve_socket.setsockopt(zmq.LINGER, 0)
-        self.recieve_socket.setsockopt(zmq.RCVHWM, 30)
+        self.recieve_socket.setsockopt(zmq.RCVHWM, 2)
 
     def load_image(self):
         pass
