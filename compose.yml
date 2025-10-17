@@ -1,20 +1,20 @@
 services:
-  redis:
-    image: redis:8.0-bookworm
-    env_file:
-      - ./redis/.env
+  # redis:
+  #   image: redis:8.0-bookworm
+  #   env_file:
+  #     - ./redis/.env
 
   backend:
     build: 
       context: "./backend"
     image: "exivium/backend:1.0"
-    depends_on:
-      - redis
-    env_file:
-      - ./backend/.env
-    volumes:
-      - "./backend/plugins:/exivium/plugins"
-      - "./backend/cameras:/exivium/cameras"
+    # depends_on:
+    #   - redis
+    # env_file:
+    #   - ./backend/.env
+    # volumes:
+    #   - "./backend/plugins:/exivium/plugins"
+    #   - "./backend/cameras:/exivium/cameras"
 
   nginx:
     image: nginx:1.28.0-bookworm
