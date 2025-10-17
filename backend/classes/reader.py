@@ -1,5 +1,6 @@
 import zmq
 from classes.recurso_base import RecursoBase
+from functions.log import log
 
 class Reader(RecursoBase):
     def __init__(self, recurso_alvo):
@@ -19,6 +20,6 @@ class Reader(RecursoBase):
         return loaded
 
     def close(self):
-        print(f"Encerrando reader {self.id}")
+        log(f"Encerrando reader {self.id}")
         self.ativo = False
         self.recieve_socket.close()

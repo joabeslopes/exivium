@@ -19,3 +19,6 @@ Thumbs.db
 # Arquivos de IDE
 .vscode/
 .pydevproject
+
+# Logs
+**/*.log

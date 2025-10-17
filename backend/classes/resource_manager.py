@@ -7,6 +7,7 @@ import zmq
 from classes.recurso_base import RecursoBase
 import multiprocessing
 import sys
+from functions.log import log
 
 class ResourceManager():
     def __init__(self):
@@ -34,7 +35,7 @@ class ResourceManager():
             case "plugin":
                 dir =  os.path.join(self.plugins_path, nome)
             case _:
-                print("Tipo de recurso desconhecido")
+                log("Erro: tipo de recurso desconhecido")
                 return ""
 
         # Se ja existir, nao cria de novo
@@ -43,12 +44,12 @@ class ResourceManager():
 
     def install_python(self, dir):
         if not os.path.exists(dir):
-            print(f"Diretório {dir} não existe")
+            log(f"Diretório {dir} não existe")
             return ""
 
         requirements_file = os.path.join(dir, 'requirements.txt')
         if not os.path.exists(requirements_file):
-            print(f"{requirements_file} não encontrado")
+            log(f"{requirements_file} não encontrado")
             return ""
 
         venv_dir = os.path.join(dir, ".venv")
@@ -60,7 +61,7 @@ class ResourceManager():
 
         if not os.path.exists(python_file):
             venv.EnvBuilder(with_pip=True).create(venv_dir)
-            print(f"Instalando dependências do {requirements_file}")
+            log(f"Instalando dependências do {requirements_file}")
             subprocess.run([python_file, '-m', 'pip', 'install', '-r', requirements_file], check=True)
 
         return python_file
@@ -78,6 +79,8 @@ class ResourceManager():
 
         python_file = self.install_python(dir)
 
+        log(f"Iniciando recurso {id}")
+
         self.resources[id] = subprocess.Popen(
             [python_file, os.path.join(dir, "main.py"), str(id), str(recurso_alvo)]
         )
@@ -85,7 +88,7 @@ class ResourceManager():
     def stop_resource(self, id):
         if id in self.resources:
             try:
-                print(f"parando recurso {id}")
+                log(f"Parando recurso {id}")
                 process = self.resources[id]
                 process.terminate()
             except Exception:
