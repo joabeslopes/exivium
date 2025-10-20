@@ -8,9 +8,12 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-def log(mensagem: str):
-    if re.search(r'\berro\b', mensagem, re.IGNORECASE):
-        logging.error(mensagem)
-    else:
-        logging.info(mensagem)
+def log(mensagem):
+    try:
+        if re.search(r'\berro\b', mensagem, re.IGNORECASE):
+            logging.error(mensagem)
+        else:
+            logging.info(mensagem)
+    except Exception:
+        pass
     print(mensagem)
