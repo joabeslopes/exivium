@@ -1,8 +1,8 @@
 # Ignora os recursos instalados mas mantem a pasta base
-plugins/*
-!plugins/__init__.py
-cameras/*
-!cameras/__init__.py
+recursos/plugins/*
+!recursos/plugins/__init__.py
+recursos/cameras/*
+!recursos/cameras/__init__.py
 
 # Arquivos de ambiente
 .env

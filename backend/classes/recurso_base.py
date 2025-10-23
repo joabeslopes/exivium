@@ -19,7 +19,7 @@ class RecursoBase():
 
     def init_send_socket(self):
         self.send_socket = self.context.socket(zmq.PUB)
-        self.send_socket.connect(self.zmq_url_in)
+        self.send_socket.connect(self.zmq_url_out)
         self.send_topic = f"recurso.{self.id}.image".encode()
         self.send_socket.setsockopt(zmq.CONFLATE, 1)
         self.send_socket.setsockopt(zmq.LINGER, 0)
@@ -27,7 +27,7 @@ class RecursoBase():
 
     def init_recieve_socket(self):
         self.recieve_socket = self.context.socket(zmq.SUB)
-        self.recieve_socket.connect(self.zmq_url_out)
+        self.recieve_socket.connect(self.zmq_url_in)
         self.recieve_topic = f"recurso.{self.recurso_alvo}.image".encode()
         self.recieve_socket.setsockopt(zmq.SUBSCRIBE, self.recieve_topic)
         self.recieve_socket.setsockopt(zmq.CONFLATE, 1)

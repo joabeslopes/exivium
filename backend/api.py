@@ -50,4 +50,5 @@ async def cria_recurso(request: NovoRecurso):
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    resource_manager.start_resource(request.id, request.nome, request.tipo, request.recurso_alvo)
+    result = await resource_manager.start_resource(request.id, request.nome, request.tipo, request.recurso_alvo, request.git_repo_url)
+    return result

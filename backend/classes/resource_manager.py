@@ -8,11 +8,12 @@ from classes.recurso_base import RecursoBase
 import multiprocessing
 import sys
 from functions.log import log
+import asyncio
 
 class ResourceManager():
     def __init__(self):
         self.resources = {}
-        base_path = os.path.dirname(sys.argv[0])
+        base_path = os.path.join( os.path.dirname(sys.argv[0]), 'recursos' )
         self.plugins_path = os.path.join(base_path, 'plugins')
         self.cameras_path = os.path.join(base_path, 'cameras')
         self.proxy_process = multiprocessing.Process(target=self.start_proxy)
@@ -20,12 +21,12 @@ class ResourceManager():
         atexit.register(self.stop_all)
 
     def start_proxy(self):
-        self.base = RecursoBase(-1,-1)
-        self.pub = self.base.context.socket(zmq.XPUB)
-        self.pub.bind(self.base.zmq_url_out)
-        self.sub = self.base.context.socket(zmq.XSUB)
-        self.sub.bind(self.base.zmq_url_in)
-        zmq.proxy(self.sub, self.pub)
+        base = RecursoBase(-1,-1)
+        pub = base.context.socket(zmq.XPUB)
+        pub.bind(base.zmq_url_in)
+        sub = base.context.socket(zmq.XSUB)
+        sub.bind(base.zmq_url_out)
+        zmq.proxy(pub, sub)
 
     def create_dir(self, nome, tipo):
         dir = ""
@@ -66,24 +67,25 @@ class ResourceManager():
 
         return python_file
 
-    def start_resource(self, id, nome, tipo, recurso_alvo, git_repo_url: str=""):
+    def _start(self, id, nome, tipo, recurso_alvo, git_repo_url) -> bool:
         if id in self.resources:
-            return ""
-
+            return True
         dir = self.create_dir(nome, tipo)
         if dir == "":
-            return ""
-
+            return False
         if not git_repo_url == "":
             repo = git.Repo.clone_from(git_repo_url, dir)
-
         python_file = self.install_python(dir)
-
         log(f"Iniciando recurso {id}")
-
         self.resources[id] = subprocess.Popen(
             [python_file, os.path.join(dir, "main.py"), str(id), str(recurso_alvo)]
         )
+
+        return self.resources[id].poll() is None
+
+    async def start_resource(self, id, nome, tipo, recurso_alvo, git_repo_url: str=""):
+        result = await asyncio.to_thread(self._start, id, nome, tipo, recurso_alvo, git_repo_url)
+        return result
 
     def stop_resource(self, id):
         if id in self.resources:
