@@ -41,7 +41,8 @@ class RecursoBase():
         return self.image
 
     def send_image(self):
-        self.send_socket.send_multipart([self.send_topic, self.image])
+        if self.image:
+            self.send_socket.send_multipart([self.send_topic, self.image])
 
     def close(self):
         self.ativo = False
