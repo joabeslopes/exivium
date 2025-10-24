@@ -1,4 +1,3 @@
-import asyncio
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from classes.reader import Reader
@@ -6,7 +5,6 @@ from classes.resource_manager import ResourceManager
 from functions.log import log
 from functions.tokens import get_token_info
 from fastapi.middleware.cors import CORSMiddleware
-import zmq
 from functions.mjpeg import gen_frame
 from classes.requests import NovoRecurso
 

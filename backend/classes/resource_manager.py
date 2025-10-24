@@ -73,7 +73,7 @@ class ResourceManager():
         dir = self.create_dir(nome, tipo)
         if dir == "":
             return False
-        if not git_repo_url == "":
+        if not git_repo_url == "" and not os.listdir(dir):
             repo = git.Repo.clone_from(git_repo_url, dir)
         python_file = self.install_python(dir)
         log(f"Iniciando recurso {id}")
@@ -102,4 +102,13 @@ class ResourceManager():
         self.proxy_process.terminate()
 
     def get_all(self):
-        return list(self.resources.keys())
+        ativos = []
+        keys = list(self.resources.keys())
+
+        for key in keys:
+            proc = self.resources[key]
+            if proc.poll() is None:
+                ativos.append(key)
+            else:
+                del self.resources[key]
+        return ativos

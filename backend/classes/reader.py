@@ -9,13 +9,14 @@ class Reader(RecursoBase):
 
     def load_image(self):
         loaded = False
-        try:
-            topico, image = self.recieve_socket.recv_multipart(flags=zmq.NOBLOCK)
-            if image:
-                self.image = image
-                loaded = True
-        except Exception as e:
-            loaded = False
+        while self.ativo:
+            try:
+                topic, image = self.recieve_socket.recv_multipart(flags=zmq.NOBLOCK)
+                if image:
+                    self.image = image
+                    loaded = True
+            except zmq.Again:
+                break
 
         return loaded
 
