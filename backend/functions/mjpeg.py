@@ -1,14 +1,13 @@
 import asyncio
 from classes.reader import Reader
 from fastapi import Request
-from functions.log import log
 
 #TODO variavel de ambiente
 FPS = 30
 
 async def gen_frame(request: Request, reader: Reader):
     try:
-        while reader.ativo:
+        while reader.active:
             if await request.is_disconnected():
                 break
 
@@ -21,6 +20,6 @@ async def gen_frame(request: Request, reader: Reader):
                         b'\r\n')
             await asyncio.sleep(1 / FPS)
     except Exception as e:
-        log(e)
+        print(e)
     finally:
         reader.close()

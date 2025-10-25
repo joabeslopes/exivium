@@ -12,49 +12,54 @@ FPS = 30
 class PrimeiroPlugin(RecursoBase):
     def __init__(self, id, recurso_alvo):
         super().__init__(id, recurso_alvo)
-        self.init_recieve_socket()
-        self.init_send_socket()
+        self.init_sub_img()
+        self.init_pub_img()
+        self.init_pub_log()
 
     def load_image(self):
         loaded = False
+        while self.active:
+            try:
+                topic, image = self.sub_img_socket.recv_multipart(flags=zmq.NOBLOCK)
+                if topic == self.sub_img_topic and image:
+                    self.image = image
+                    loaded = True
+            except zmq.Again:
+                break
+
+        return loaded
+
+    def processa(self):
         try:
-            topic, image = self.recieve_socket.recv_multipart(flags=zmq.NOBLOCK)
-            frame_array = np.frombuffer(image, dtype=np.uint8)
+            frame_array = np.frombuffer(self.image, dtype=np.uint8)
             frame = cv2.imdecode(frame_array, cv2.IMREAD_COLOR)
             gray_image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             loaded, buffer = cv2.imencode(".jpg", gray_image, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
             if loaded:
                 self.image = buffer.tobytes()
-        except zmq.Again:
-            loaded = False
+                
+                self.send_image()
         except Exception as e:
-            loaded = False
-            self.close()
-
-        return loaded
+            print(e)
+            raise e
 
     def close(self):
-        print(f"Parando plugin {self.id}")
-        self.ativo = False
-        self.send_socket.close()
-        self.recieve_socket.close()
-
+        self.send_log(f"Parando plugin {self.id}")
+        self.active = False
+        self.sub_img_socket.close()
+        self.pub_img_socket.close()
+        self.pub_log_socket.close()
 
 def main(id, target):
-    print(f'Rodando plugin exemplo na camera {target}')
-
     reader = PrimeiroPlugin(id, target)
-    while reader.ativo:
+    reader.send_log(f'Rodando primeiro plugin na camera {target}')
+    while reader.active:
         try:
             if reader.load_image():
-                reader.send_image()
-        except zmq.Again:
-            continue
-        except KeyboardInterrupt:
+                reader.processa()
+        except Exception:
             reader.close()
             break
-        except Exception:
-            continue
         time.sleep(1/FPS)
 
 if __name__ == "__main__":

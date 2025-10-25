@@ -22,10 +22,13 @@ class ResourceManager():
 
     def start_proxy(self):
         base = RecursoBase(-1,-1)
+
         pub = base.context.socket(zmq.XPUB)
         pub.bind(base.zmq_url_in)
+
         sub = base.context.socket(zmq.XSUB)
         sub.bind(base.zmq_url_out)
+
         zmq.proxy(pub, sub)
 
     def create_dir(self, nome, tipo):

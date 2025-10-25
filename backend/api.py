@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from classes.reader import Reader
 from classes.resource_manager import ResourceManager
+from classes.logger import Logger
 from functions.log import log
 from functions.tokens import get_token_info
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,7 @@ from classes.requests import NovoRecurso
 
 app = FastAPI(root_path="/api")
 resource_manager = ResourceManager()
+logger = Logger()
 
 app.add_middleware(
     CORSMiddleware,

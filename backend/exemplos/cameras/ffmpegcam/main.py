@@ -16,7 +16,8 @@ JPEG_QUALITY = 70
 class FFmpegCamera(RecursoBase):
     def __init__(self, id, recurso_alvo):
         super().__init__(id, recurso_alvo)
-        self.init_send_socket()
+        self.init_pub_img()
+        self.init_pub_log()
         self.thread = Thread(target=self._run_ffmpeg)
         self.thread.start()
 
@@ -45,7 +46,7 @@ class FFmpegCamera(RecursoBase):
         )
 
         try:
-            while self.ativo:
+            while self.active:
                 raw_frame = process.stdout.read(frame_size)
                 if len(raw_frame) != frame_size:
                     break
@@ -63,19 +64,21 @@ class FFmpegCamera(RecursoBase):
         finally:
             process.terminate()
             process.wait(timeout=2)
-            self.ativo = False
+            self.active = False
 
     def close(self):
-        print(f"Parando câmera {self.id}")
-        self.ativo = False
+        self.send_log(f"Parando camera ffmpeg {self.id}")
+        self.active = False
         self.thread.join(timeout=2)
-        self.send_socket.close()
+        self.pub_img_socket.close()
+        self.pub_log_socket.close()
 
 
 def main(id, recurso_alvo):
     cam = FFmpegCamera(id, recurso_alvo)
+    cam.send_log(f"Rodando camera ffmpeg {id}")
     try:
-        while cam.ativo:
+        while cam.active:
             time.sleep(1)
     except KeyboardInterrupt:
         cam.close()

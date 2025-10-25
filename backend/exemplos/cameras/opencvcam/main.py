@@ -16,10 +16,10 @@ class OpencvCam(RecursoBase):
         if recurso_alvo.isdigit():
             recurso_alvo = int(recurso_alvo)
         self.cap = cv2.VideoCapture(recurso_alvo)
-        self.ativo = self.cap.isOpened()
+        self.active = self.cap.isOpened()
 
-        if not self.ativo:
-            print(f"Camera {recurso_alvo} invalida")
+        if not self.active:
+            self.send_log(f"Camera {recurso_alvo} invalida")
             return
 
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
@@ -36,10 +36,11 @@ class OpencvCam(RecursoBase):
             else:
                 self.size_offset = -1
 
-        self.init_send_socket()
+        self.init_pub_img()
+        self.init_pub_log()
 
     def load_image(self):
-        if not self.ativo:
+        if not self.active:
             return False
 
         readed, frame = self.cap.read()
@@ -62,18 +63,20 @@ class OpencvCam(RecursoBase):
             return False
 
     def close(self):
-        print(f"Parando camera {self.id}")
-        self.ativo = False
-        if self.send_socket:
-            self.send_socket.close()
-        if self.cap:
+        self.send_log(f"Parando camera opencv {self.id}")
+        self.active = False
+        if hasattr(self, "pub_img_socket"):
+            self.pub_img_socket.close()
+        if hasattr(self, "pub_log_socket"):
+            self.pub_log_socket.close()
+        if hasattr(self, "cap"):
             self.cap.release()
 
 def main(id, recurso_alvo):
     try:
-        print(f"Iniciando camera {id}")
         cam = OpencvCam(id, recurso_alvo)
-        while cam.ativo:
+        cam.send_log(f"Rodando camera opencv {id}")
+        while cam.active:
             if cam.load_image():
                 cam.send_image()
             time.sleep(1 / FPS)
