@@ -1,6 +1,7 @@
 import os
 import venv
 import subprocess
+import signal
 import git
 import atexit
 import zmq
@@ -87,21 +88,31 @@ class ResourceManager():
         return self.resources[id].poll() is None
 
     async def start_resource(self, id, nome, tipo, recurso_alvo, git_repo_url: str=""):
+        self.get_all() # Começa limpando recursos inativos
         result = await asyncio.to_thread(self._start, id, nome, tipo, recurso_alvo, git_repo_url)
         return result
 
-    def stop_resource(self, id):
+    def _stop(self, id):
+        result = False
         if id in self.resources:
             try:
                 log(f"Parando recurso {id}")
                 process = self.resources[id]
                 process.terminate()
-            except Exception:
-                pass
+                result = True
+            except Exception as e:
+                print(e)
+            finally:
+                self.get_all()
+        return result
+
+    async def stop_resource(self, id):
+        result = await asyncio.to_thread(self._stop, id)
+        return result
 
     def stop_all(self):
         for id in self.resources:
-            self.stop_resource(id)
+            self._stop(id)
         self.proxy_process.terminate()
 
     def get_all(self):

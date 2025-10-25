@@ -52,3 +52,13 @@ async def cria_recurso(request: NovoRecurso):
 
     result = await resource_manager.start_resource(request.id, request.nome, request.tipo, request.recurso_alvo, request.git_repo_url)
     return result
+
+@app.delete("/recurso/{id}")
+async def para_recurso(token: str, id: int):
+    info = await get_token_info(token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    result = await resource_manager.stop_resource(id)
+    return result
