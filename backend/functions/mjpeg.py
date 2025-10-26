@@ -1,9 +1,9 @@
 import asyncio
 from classes.reader import Reader
 from fastapi import Request
+import os
 
-#TODO variavel de ambiente
-FPS = 30
+FPS = int( os.environ.get("FPS") )
 
 async def gen_frame(request: Request, reader: Reader):
     try:

@@ -6,12 +6,12 @@ import time
 import sys
 import zmq
 from recurso_base import RecursoBase
+import os
 
-#TODO variavel de ambiente
-FPS = 30
-FRAME_WIDTH = 640
-FRAME_HEIGHT = 480
-JPEG_QUALITY = 70
+FPS = int( os.environ.get("FPS") )
+FRAME_WIDTH = int( os.environ.get("FRAME_WIDTH") )
+FRAME_HEIGHT = int( os.environ.get("FRAME_HEIGHT") )
+JPEG_QUALITY = int( os.environ.get("JPEG_QUALITY") )
 
 class FFmpegCamera(RecursoBase):
     def __init__(self, id, recurso_alvo):

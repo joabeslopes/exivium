@@ -4,10 +4,10 @@ import sys
 import numpy as np
 import zmq
 import time
+import os
 
-#TODO variavel de ambiente
-JPEG_QUALITY = 70
-FPS = 30
+FPS = int( os.environ.get("FPS") )
+JPEG_QUALITY = int( nviron.get("JPEG_QUALITY") )
 
 class PrimeiroPlugin(RecursoBase):
     def __init__(self, id, recurso_alvo):

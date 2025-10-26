@@ -2,16 +2,18 @@ import cv2
 import sys
 from recurso_base import RecursoBase
 import time
+import os
 
-#TODO variavel de ambiente
-JPEG_QUALITY = 70
-FRAME_WIDTH = 640
-FRAME_HEIGHT = 360
-FPS = 30
+FPS = int( os.environ.get("FPS") )
+FRAME_WIDTH = int( os.environ.get("FRAME_WIDTH") )
+FRAME_HEIGHT = int( os.environ.get("FRAME_HEIGHT") )
+JPEG_QUALITY = int( os.environ.get("JPEG_QUALITY") )
 
 class OpencvCam(RecursoBase):
     def __init__(self, id, recurso_alvo):
         super().__init__(id, recurso_alvo)
+        self.init_pub_img()
+        self.init_pub_log()
 
         if recurso_alvo.isdigit():
             recurso_alvo = int(recurso_alvo)
@@ -35,9 +37,6 @@ class OpencvCam(RecursoBase):
                 self.size_offset = 1
             else:
                 self.size_offset = -1
-
-        self.init_pub_img()
-        self.init_pub_log()
 
     def load_image(self):
         if not self.active:
@@ -80,10 +79,8 @@ def main(id, recurso_alvo):
             if cam.load_image():
                 cam.send_image()
             time.sleep(1 / FPS)
-    except Exception:
-        pass
-    finally:
-        cam.close()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
