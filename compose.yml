@@ -1,17 +1,14 @@
 services:
-  # redis:
-  #   image: redis:8.0-bookworm
-  #   env_file:
-  #     - ./redis/.env
 
   backend:
     build: 
       context: "./backend"
     image: "exivium/backend:1.0"
-    # depends_on:
-    #   - redis
-    # env_file:
-    #   - ./backend/.env
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql+psycopg://exivium:exivium@db:5432/exivium
+
     # volumes:
     #   - "./backend/plugins:/exivium/plugins"
     #   - "./backend/cameras:/exivium/cameras"
@@ -27,3 +24,20 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./frontend:/var/www/frontend:ro
       - ./nginx/ssl:/etc/nginx/ssl/:ro
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: exivium
+      POSTGRES_USER: exivium
+      POSTGRES_PASSWORD: exivium
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U exivium -d exivium"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+volumes:
+  db-data:

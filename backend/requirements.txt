@@ -3,3 +3,6 @@ uvicorn==0.34.1
 python-jose[cryptography]==3.4.0
 pyzmq==27.1.0
 GitPython==3.1.45
+SQLAlchemy==2.0.36
+alembic==1.13.3
+psycopg[binary]==3.2.3

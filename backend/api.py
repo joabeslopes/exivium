@@ -8,6 +8,10 @@ from functions.tokens import get_token_info
 from fastapi.middleware.cors import CORSMiddleware
 from functions.mjpeg import gen_frame
 from classes.requests import NovoRecurso
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from db import Base, engine, get_db
+import models
 
 app = FastAPI(root_path="/api")
 resource_manager = ResourceManager()
@@ -62,3 +66,7 @@ async def para_recurso(token: str, id: int):
 
     result = await resource_manager.stop_resource(id)
     return result
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
