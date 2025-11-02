@@ -7,7 +7,7 @@ import time
 import os
 
 FPS = int( os.environ.get("FPS") )
-JPEG_QUALITY = int( nviron.get("JPEG_QUALITY") )
+JPEG_QUALITY = int( os.environ.get("JPEG_QUALITY") )
 
 class PrimeiroPlugin(RecursoBase):
     def __init__(self, id, recurso_alvo):

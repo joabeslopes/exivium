@@ -1,17 +1,30 @@
 services:
 
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - "./backend/.env"
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   backend:
     build: 
       context: "./backend"
     image: "exivium/backend:1.0"
     depends_on:
       - db
-    environment:
-      - DATABASE_URL=postgresql+psycopg://exivium:exivium@db:5432/exivium
-
-    # volumes:
-    #   - "./backend/plugins:/exivium/plugins"
-    #   - "./backend/cameras:/exivium/cameras"
+    env_file:
+      - "./backend/.env"
+    volumes:
+      - "./backend/recursos/plugins:/exivium/recursos/plugins"
+      - "./backend/recursos/cameras:/exivium/recursos/cameras"
 
   nginx:
     image: nginx:1.28.0-bookworm
@@ -24,20 +37,6 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./frontend:/var/www/frontend:ro
       - ./nginx/ssl:/etc/nginx/ssl/:ro
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: exivium
-      POSTGRES_USER: exivium
-      POSTGRES_PASSWORD: exivium
-    ports:
-      - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U exivium -d exivium"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+
 volumes:
   db-data:

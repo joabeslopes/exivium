@@ -1,8 +1,9 @@
 from datetime import datetime
 from sqlalchemy import String, Integer, Text, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
-from db import Base
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 
+class Base(DeclarativeBase):
+    pass
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -17,15 +18,20 @@ class Usuario(Base):
         DateTime(timezone=True), server_default=func.now()
     )
 
-
 class Recurso(Base):
     __tablename__ = "recursos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nome: Mapped[str] = mapped_column(String(120), nullable=False)
     tipo: Mapped[str] = mapped_column(String(50), nullable=False)
-    recurso_alvo: Mapped[str] = mapped_column(String(200), nullable=False)
-    ativo: Mapped[str] = mapped_column(String(1), default="S", nullable=False)
-    data_criacao: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    data_criacao: Mapped[datetime] = mapped_column( DateTime(timezone=True), server_default=func.now() )
+    git_repo_url: Mapped[str] = mapped_column(Text, nullable=True)
+
+class RecursoAtivo(Base):
+    __tablename__ = "recursos_ativos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    recurso_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    recurso_alvo: Mapped[str] = mapped_column(Text, nullable=False)
+    ativo: Mapped[str] = mapped_column(String(1), default="X", nullable=True)
+    data_criacao: Mapped[datetime] = mapped_column( DateTime(timezone=True), server_default=func.now() )

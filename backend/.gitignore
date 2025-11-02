@@ -4,10 +4,6 @@ recursos/plugins/*
 recursos/cameras/*
 !recursos/cameras/__init__.py
 
-# Arquivos de ambiente
-.env
-.venv
-
 # Arquivos de cache
 __pycache__
 *.py[cod]

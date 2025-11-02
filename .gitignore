@@ -1,4 +1,6 @@
+# Arquivos de ambiente
 **/*.env
+**/.venv
 
 nginx/nginx.conf
 nginx/ssl/*

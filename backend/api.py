@@ -7,15 +7,14 @@ from functions.log import log
 from functions.tokens import get_token_info
 from fastapi.middleware.cors import CORSMiddleware
 from functions.mjpeg import gen_frame
-from classes.requests import NovoRecurso
+from classes.requests import StartRecurso
 from fastapi import Depends
-from sqlalchemy.orm import Session
-from db import Base, engine, get_db
-import models
+from classes.db import Database
 
 app = FastAPI(root_path="/api")
-resource_manager = ResourceManager()
 logger = Logger()
+db = Database()
+resource_manager = ResourceManager(db)
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,13 +47,13 @@ async def get_all_cameras(token: str):
     return resource_manager.get_all()
 
 @app.post("/recurso")
-async def cria_recurso(request: NovoRecurso):
+async def cria_recurso(request: StartRecurso):
     info = await get_token_info(request.token)
     if not info:
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    result = await resource_manager.start_resource(request.id, request.nome, request.tipo, request.recurso_alvo, request.git_repo_url)
+    result = await resource_manager.start_resource(request.id, request.recurso_alvo)
     return result
 
 @app.delete("/recurso/{id}")
@@ -66,7 +65,3 @@ async def para_recurso(token: str, id: int):
 
     result = await resource_manager.stop_resource(id)
     return result
-
-@app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all(bind=engine)

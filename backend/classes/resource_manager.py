@@ -10,16 +10,28 @@ import multiprocessing
 import sys
 from functions.log import log
 import asyncio
+from classes.db import Database
+from classes.models import RecursoAtivo, Recurso
+from sqlalchemy import select
 
 class ResourceManager():
-    def __init__(self):
+    def __init__(self, db: Database):
         self.resources = {}
         base_path = os.path.join( os.path.dirname(sys.argv[0]), 'recursos' )
         self.plugins_path = os.path.join(base_path, 'plugins')
         self.cameras_path = os.path.join(base_path, 'cameras')
         self.proxy_process = multiprocessing.Process(target=self.start_proxy)
         self.proxy_process.start()
+        self.db = db
         atexit.register(self.stop_all)
+        self.start_db_resources()
+
+    def start_db_resources(self):
+        query = select(RecursoAtivo, Recurso).join(Recurso, RecursoAtivo.recurso_id == Recurso.id)
+        resources = self.db.get_all(query)
+        if resources:
+            for ativo, recurso in resources:
+                self._start(ativo.id, recurso.id, recurso.nome, recurso.tipo, ativo.recurso_alvo)
 
     def start_proxy(self):
         base = RecursoBase(-1,-1)
@@ -71,7 +83,7 @@ class ResourceManager():
 
         return python_file
 
-    def _start(self, id, nome, tipo, recurso_alvo, git_repo_url) -> bool:
+    def _start(self, id, recurso_id, nome, tipo, recurso_alvo, git_repo_url="") -> bool:
         if id in self.resources:
             return True
         dir = self.create_dir(nome, tipo)
@@ -80,16 +92,36 @@ class ResourceManager():
         if not git_repo_url == "" and not os.listdir(dir):
             repo = git.Repo.clone_from(git_repo_url, dir)
         python_file = self.install_python(dir)
-        log(f"Iniciando recurso {id}")
+
+        log(f"Iniciando recurso ativo {id}")
+
         self.resources[id] = subprocess.Popen(
             [python_file, os.path.join(dir, "main.py"), str(id), str(recurso_alvo)]
         )
 
         return self.resources[id].poll() is None
 
-    async def start_resource(self, id, nome, tipo, recurso_alvo, git_repo_url: str=""):
+    async def start_resource(self, recurso_id, recurso_alvo, git_repo_url: str=""):
         self.get_all() # Começa limpando recursos inativos
-        result = await asyncio.to_thread(self._start, id, nome, tipo, recurso_alvo, git_repo_url)
+
+        # Busca recurso pelo id
+        query_recurso = select(Recurso).where(Recurso.id == recurso_id)
+        db_recurso = self.db.get_first(query_recurso)
+        if not db_recurso:
+            return False
+        recurso = db_recurso[0]
+
+        # Busca relaçao de recurso ativo
+        recurso_ativo = None
+        query_ativo = select(RecursoAtivo).where(RecursoAtivo.recurso_id == recurso_id).where(RecursoAtivo.recurso_alvo == recurso_alvo)
+        db_ativo = self.db.get_first(query_ativo)
+        if not db_ativo:
+            recurso_ativo = RecursoAtivo(recurso_id=recurso_id, recurso_alvo=recurso_alvo)
+            self.db.add(recurso_ativo)
+        else:
+            recurso_ativo = db_ativo[0]
+
+        result = await asyncio.to_thread(self._start, recurso_ativo.id, recurso_id, recurso.nome, recurso.tipo, recurso_alvo, git_repo_url)
         return result
 
     def _stop(self, id):
@@ -114,6 +146,7 @@ class ResourceManager():
         for id in self.resources:
             self._stop(id)
         self.proxy_process.terminate()
+        self.db.close()
 
     def get_all(self):
         ativos = []
