@@ -17,11 +17,21 @@ class Database():
         self.session.close()
 
     def add(self, model):
-        self.session.add(model)
-        self.session.commit()
+        if model:
+            self.session.add(model)
+            self.session.commit()
 
     def get_all(self, query):
         return self.session.execute(query).all()
 
     def get_first(self, query):
-        return self.session.execute(query).first()
+        result = self.session.execute(query).first()
+        if result:
+            return result[0]
+        else:
+            return None
+
+    def delete(self, model):
+        if model:
+            self.session.delete(model)
+            self.session.commit()

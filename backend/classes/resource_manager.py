@@ -27,11 +27,12 @@ class ResourceManager():
         self.start_db_resources()
 
     def start_db_resources(self):
-        query = select(RecursoAtivo, Recurso).join(Recurso, RecursoAtivo.recurso_id == Recurso.id)
-        resources = self.db.get_all(query)
-        if resources:
-            for ativo, recurso in resources:
-                self._start(ativo.id, recurso.id, recurso.nome, recurso.tipo, ativo.recurso_alvo)
+        query = select(RecursoAtivo)
+        ativos = self.db.get_all(query)
+        if ativos:
+            for a in ativos:
+                ativo = a[0]
+                self._start(ativo.recurso_id, ativo.recurso_alvo)
 
     def start_proxy(self):
         base = RecursoBase(-1,-1)
@@ -83,14 +84,69 @@ class ResourceManager():
 
         return python_file
 
-    def _start(self, id, recurso_id, nome, tipo, recurso_alvo, git_repo_url="") -> bool:
-        if id in self.resources:
-            return True
+    def _create(self, nome, tipo, git_repo_url="") -> int:
+        # Busca recurso pelo nome e tipo
+        query_recurso = select(Recurso).where(Recurso.nome == nome).where(Recurso.tipo == tipo)
+        db_recurso = self.db.get_first(query_recurso)
+        if db_recurso:
+            return db_recurso.id
+
+        log(f"Criando recurso {nome}")
+
         dir = self.create_dir(nome, tipo)
         if dir == "":
-            return False
+            return 0
         if not git_repo_url == "" and not os.listdir(dir):
             repo = git.Repo.clone_from(git_repo_url, dir)
+        python_file = self.install_python(dir)
+
+        if python_file != "":
+            recurso = Recurso(nome=nome, tipo=tipo, git_repo_url=git_repo_url)
+            self.db.add(recurso)
+            return recurso.id
+        else:
+            return 0
+
+    async def create_resource(self, nome: str, tipo: str, git_repo_url: str="") -> int:
+        result = await asyncio.to_thread(self._create, nome, tipo, git_repo_url)
+        return result
+
+
+    def _start(self, recurso_id, recurso_alvo) -> int:
+        self.get_all() # Começa limpando recursos inativos
+
+        # Busca recurso pelo id
+        query_recurso = select(Recurso).where(Recurso.id == recurso_id)
+        db_recurso = self.db.get_first(query_recurso)
+        if not db_recurso:
+            return 0
+        recurso = db_recurso
+
+        # Busca relaçao de recurso ativo
+        recurso_ativo = None
+        query_ativo = select(RecursoAtivo
+        ).where(RecursoAtivo.recurso_id == recurso_id
+        ).where(RecursoAtivo.recurso_alvo == recurso_alvo)
+
+        db_ativo = self.db.get_first(query_ativo)
+        if not db_ativo:
+            recurso_ativo = RecursoAtivo(recurso_id=recurso_id, recurso_alvo=recurso_alvo)
+            self.db.add(recurso_ativo)
+        else:
+            recurso_ativo = db_ativo
+
+        id = recurso_ativo.id
+        if id in self.resources:
+            return id
+        
+        dir = self.create_dir(recurso.nome, recurso.tipo)
+        if dir == "":
+            return 0
+
+        git_repo_url = recurso.git_repo_url
+        if git_repo_url and ( git_repo_url != "" and not os.listdir(dir) ):
+            repo = git.Repo.clone_from(git_repo_url, dir)
+
         python_file = self.install_python(dir)
 
         log(f"Iniciando recurso ativo {id}")
@@ -99,32 +155,18 @@ class ResourceManager():
             [python_file, os.path.join(dir, "main.py"), str(id), str(recurso_alvo)]
         )
 
-        return self.resources[id].poll() is None
-
-    async def start_resource(self, recurso_id, recurso_alvo, git_repo_url: str=""):
-        self.get_all() # Começa limpando recursos inativos
-
-        # Busca recurso pelo id
-        query_recurso = select(Recurso).where(Recurso.id == recurso_id)
-        db_recurso = self.db.get_first(query_recurso)
-        if not db_recurso:
-            return False
-        recurso = db_recurso[0]
-
-        # Busca relaçao de recurso ativo
-        recurso_ativo = None
-        query_ativo = select(RecursoAtivo).where(RecursoAtivo.recurso_id == recurso_id).where(RecursoAtivo.recurso_alvo == recurso_alvo)
-        db_ativo = self.db.get_first(query_ativo)
-        if not db_ativo:
-            recurso_ativo = RecursoAtivo(recurso_id=recurso_id, recurso_alvo=recurso_alvo)
-            self.db.add(recurso_ativo)
+        if self.resources[id].poll() is None:
+            return id
         else:
-            recurso_ativo = db_ativo[0]
+            return 0
 
-        result = await asyncio.to_thread(self._start, recurso_ativo.id, recurso_id, recurso.nome, recurso.tipo, recurso_alvo, git_repo_url)
+    async def start_resource(self, recurso_id: int, recurso_alvo) -> int:
+        result = await asyncio.to_thread(self._start, recurso_id, recurso_alvo)
         return result
 
-    def _stop(self, id):
+    def _stop(self, id) -> bool:
+        self.get_all() # Começa limpando recursos inativos
+
         result = False
         if id in self.resources:
             try:
@@ -138,12 +180,23 @@ class ResourceManager():
                 self.get_all()
         return result
 
-    async def stop_resource(self, id):
+    def _delete(self, id):
+        query = select(RecursoAtivo).where(RecursoAtivo.id == id)
+        ativo = self.db.get_first(query)
+        self.db.delete(ativo)
+
+    async def stop_resource(self, id) -> bool:
         result = await asyncio.to_thread(self._stop, id)
+        if result:
+            await asyncio.to_thread(self._delete, id)
         return result
 
     def stop_all(self):
-        for id in self.resources:
+        self.get_all() # Começa limpando recursos inativos
+
+        keys = list(self.resources.keys())
+
+        for id in keys:
             self._stop(id)
         self.proxy_process.terminate()
         self.db.close()
@@ -152,10 +205,10 @@ class ResourceManager():
         ativos = []
         keys = list(self.resources.keys())
 
-        for key in keys:
-            proc = self.resources[key]
+        for id in keys:
+            proc = self.resources[id]
             if proc.poll() is None:
-                ativos.append(key)
+                ativos.append(id)
             else:
-                del self.resources[key]
+                del self.resources[id]
         return ativos

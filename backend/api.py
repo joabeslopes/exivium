@@ -7,7 +7,7 @@ from functions.log import log
 from functions.tokens import get_token_info
 from fastapi.middleware.cors import CORSMiddleware
 from functions.mjpeg import gen_frame
-from classes.requests import StartRecurso
+from classes.requests import StartRecurso, NovoRecurso
 from fastapi import Depends
 from classes.db import Database
 
@@ -46,6 +46,16 @@ async def get_all_cameras(token: str):
 
     return resource_manager.get_all()
 
+@app.post("/recurso/new")
+async def cria_recurso(request: NovoRecurso):
+    info = await get_token_info(request.token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    result = await resource_manager.create_resource(request.nome, request.tipo, request.git_repo_url)
+    return result
+
 @app.post("/recurso")
 async def cria_recurso(request: StartRecurso):
     info = await get_token_info(request.token)
@@ -53,7 +63,7 @@ async def cria_recurso(request: StartRecurso):
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    result = await resource_manager.start_resource(request.id, request.recurso_alvo)
+    result = await resource_manager.start_resource(request.recurso_id, request.recurso_alvo)
     return result
 
 @app.delete("/recurso/{id}")

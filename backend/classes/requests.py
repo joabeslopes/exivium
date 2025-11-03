@@ -3,7 +3,7 @@ from typing import Optional
 
 class StartRecurso(BaseModel):
     token: str
-    id: int
+    recurso_id: int
     recurso_alvo: str
 
 class NovoRecurso(BaseModel):
