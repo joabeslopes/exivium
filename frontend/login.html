@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/login.css">
+    <title>Login</title>
+    <style>
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <fieldset>
+            <div class="logo-container">
+                <img src="img/logo.png" alt="Logo do sistema de câmeras">
+            </div>
+            <form class="formulario" action="login.php" method="post">
+                <legend><b>Login de Clientes</b></legend>
+                <div class="inputBox">
+                    <label for="email" class="labelInput">E-mail</label>
+                    <input type="email" name="email" id="email" class="inputUser" required>
+                </div>
+                <br>
+                <div class="inputBox">
+                    <label for="senha" class="labelInput">Senha</label>
+                    <input type="password" name="senha" id="senha" class="inputUser" required>
+                </div>
+                <br>
+                <input type="submit" value="Login" id="submit">
+            </form>
+        </fieldset>
+    </div>
+</body>
+</html>
