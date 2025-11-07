@@ -1,0 +1,119 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+}
+
+/* Caixa principal estilo vidro */
+.box {
+    width: 100%;
+    max-width: 350px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 25px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    text-align: center;
+    color: #fff;
+}
+
+/* Remove linha branca do fieldset */
+fieldset {
+    border: none;   /* 🔥 remove borda branca */
+    padding: 0;
+    margin: 0;
+}
+
+/* Logo */
+.logo-container img {
+    width: 80px;   /* menor */
+    margin: 10px auto 15px auto;
+    display: block;
+}
+
+/* Título */
+legend {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #fff;
+    text-shadow: 0px 0px 6px rgba(0,0,0,0.5);
+}
+
+/* Inputs */
+.inputBox {
+    margin: 12px 0;
+    text-align: left;
+}
+
+.labelInput {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #ddd;
+    margin-bottom: 5px;
+}
+
+.inputUser {
+    width: 100%;
+    padding: 8px 10px;   /* 🔥 menor */
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.9rem;   /* 🔥 menor */
+    outline: none;
+    transition: 0.3s;
+}
+
+.inputUser:focus {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 6px rgba(255,255,255,0.3);
+}
+
+/* Botão */
+#submit {
+    width: 100%;
+    padding: 10px;   /* 🔥 menor */
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: #fff;
+    font-size: 0.95rem;   /* 🔥 menor */
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+#submit:hover {
+    background: linear-gradient(135deg, #0072ff, #00c6ff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,114,255,0.4);
+}
+
+/* Link */
+p {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #ccc;
+}
+
+p a {
+    color: #00c6ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
