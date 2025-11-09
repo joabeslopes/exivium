@@ -1,119 +1,107 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/*Fundo principal*/
 body {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  height: 633px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
 }
 
-/* Caixa principal estilo vidro */
-.box {
-    width: 100%;
-    max-width: 350px;
-    background: rgba(255, 255, 255, 0.08);
-    padding: 25px 20px;
-    border-radius: 20px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    text-align: center;
-    color: #fff;
+
+.container-global {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
-/* Remove linha branca do fieldset */
-fieldset {
-    border: none;   /* 🔥 remove borda branca */
-    padding: 0;
-    margin: 0;
+/*Formulário*/
+.formulario {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 320px;
+  padding: 40px 25px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
 }
 
-/* Logo */
-.logo-container img {
-    width: 80px;   /* menor */
-    margin: 10px auto 15px auto;
-    display: block;
+.formulario:hover {
+  background: rgba(83, 126, 161, 0.171);
+  transform: scale(1.01);
+  box-shadow: 0 0 30px rgba(90, 100, 112, 0.2);
 }
 
-/* Título */
-legend {
-    font-size: 1.3rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #fff;
-    text-shadow: 0px 0px 6px rgba(0,0,0,0.5);
+/*Logo*/
+.formulario img {
+  margin-bottom: 20px;
 }
 
-/* Inputs */
-.inputBox {
-    margin: 12px 0;
-    text-align: left;
+
+.formulario label {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #fff;
 }
 
-.labelInput {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #ddd;
-    margin-bottom: 5px;
+/*Campos*/
+.formulario input[type="text"],
+.formulario input[type="password"] {
+  width: 100%;
+  height: 35px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  padding-left: 10px;
+  outline: none;
+  transition: background 0.3s ease;
 }
 
-.inputUser {
-    width: 100%;
-    padding: 8px 10px;   /* 🔥 menor */
-    border: none;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-size: 0.9rem;   /* 🔥 menor */
-    outline: none;
-    transition: 0.3s;
+.formulario input[type="text"]:focus,
+.formulario input[type="password"]:focus {
+  background: rgba(131, 83, 83, 0.25);
 }
 
-.inputUser:focus {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 6px rgba(255,255,255,0.3);
+/*Botão ACESSAR*/
+.formulario input[type="submit"] {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
 }
 
-/* Botão */
-#submit {
-    width: 100%;
-    padding: 10px;   /* 🔥 menor */
-    margin-top: 10px;
-    border: none;
-    border-radius: 6px;
-    background: linear-gradient(135deg, #00c6ff, #0072ff);
-    color: #fff;
-    font-size: 0.95rem;   /* 🔥 menor */
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.4s;
+.formulario input[type="submit"]:hover {
+  background: linear-gradient(135deg, #0072ff, #00c6ff);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
 }
 
-#submit:hover {
-    background: linear-gradient(135deg, #0072ff, #00c6ff);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,114,255,0.4);
-}
-
-/* Link */
-p {
-    margin-top: 12px;
-    font-size: 0.85rem;
-    color: #ccc;
-}
-
-p a {
-    color: #00c6ff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-p a:hover {
-    text-decoration: underline;
+/*Responsividade*/
+@media (max-width: 400px) {
+  .formulario {
+    width: 85%;
+    padding: 30px 20px;
+  }
 }
