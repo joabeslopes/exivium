@@ -34,14 +34,15 @@ function loadCameraStreams(visibleCount) {
   const allCameraCards = document.querySelectorAll('.camera-card');
   
   allCameraCards.forEach((card, index) => {
-    const cameraNumber = index + 1;
     const videoElement = card.querySelector('img');
     const statusIndicator = card.querySelector('.status-indicator');
 
     // Se a câmera estiver visível
-    if (cameraNumber <= visibleCount) {
-      
-      if (STREAM_CAMERAS.includes(cameraNumber)) {
+    if (index <= visibleCount) {
+
+      const cameraNumber = STREAM_CAMERAS[index];
+
+      if (cameraNumber) {
 
         videoElement.src = `${apiUrl}/video/${cameraNumber}?token=${token}`;
         videoElement.style.display = 'block';
@@ -56,9 +57,9 @@ function loadCameraStreams(visibleCount) {
           statusIndicator.classList.add('offline');
          
         };
-        
+
       } else {
-        console.warn(`URL de stream não definida para a Câmera ${cameraNumber}`);
+        console.warn(`URL de stream não definida para a câmera ${index}`);
         videoElement.src = '';
         videoElement.style.display = 'none';
         statusIndicator.classList.remove('online');
