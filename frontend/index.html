@@ -1,84 +1,37 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameras</title>
-    <link rel="stylesheet" href="css/index.css">
-    <!-- Ícones para os controles -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Sistema - Monitoramento</title>
+  <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
   <header>
     <div class="logo">
       <img src="img/logo.png" alt="Logo do sistema">
-      <h1>Monitoramento em Tempo Real</h1>
+      <h1>Sistema de Monitoramento</h1>
     </div>
-
-    <nav>
-      <label for="cameraCount">Visualizar:</label>
-      <select id="cameraCount">
-        <option value="1">1 Câmera</option>
-        <option value="2">2 Câmeras</option>
-        <option value="3">3 Câmeras</option>
-        <option value="4" selected>4 Câmeras</option>
-      </select>
-      <button id="logoutBtn">Sair</button>
-    </nav>
+    <button id="logoutBtn"><a href="login.html">Sair</a></button>
   </header>
 
-  <main class="camera-grid" data-camera-count="4">
-    
-    <div class="camera-card" data-camera="1">
-      <h2>Câmera 1</h2>
-      <div class="video-container">
-        <img id="video-1" src="http://localhost:5000/camera/0" alt="Câmera 1" />
-        <div class="status-indicator online"></div>
-        <div class="controls">
-          <button class="btn-fullscreen" title="Tela Cheia"><i class="fas fa-expand"></i></button>
-        </div>
-      </div>
-    </div>
+  <main class="container">
+    <section class="welcome">
+      <h2>Bem-vindo, <span id="userName">Usuário</span></h2>
+      <p>Escolha uma opção para continuar:</p>
+    </section>
 
-    <div class="camera-card" data-camera="2">
-      <h2>Câmera 2</h2>
-      <div class="video-container">
-         <img id="video-1" src="http://localhost:5000/camera/1" alt="Câmera 2" />
-        <div class="status-indicator online"></div>
-        <div class="controls">
-          <button class="btn-fullscreen" title="Tela Cheia"><i class="fas fa-expand"></i></button>
-        </div>
-      </div>
-    </div>
-
-    <div class="camera-card" data-camera="3">
-      <h2>Câmera 3</h2>
-      <div class="video-container">
-         <img id="video-1" src="http://localhost:5000/camera/2" alt="Câmera 3" />
-        <div class="status-indicator online"></div>
-        <div class="controls">
-          <button class="btn-fullscreen" title="Tela Cheia"><i class="fas fa-expand"></i></button>
-        </div>
-      </div>
-    </div>
-
-    <div class="camera-card" data-camera="4">
-      <h2>Câmera 4</h2>
-      <div class="video-container">
-         <img id="video-1" src="http://localhost:5000/camera/3" alt="Câmera 4" />
-        <div class="status-indicator online"></div>
-        <div class="controls">
-          <button class="btn-fullscreen" title="Tela Cheia"><i class="fas fa-expand"></i></button>
-        </div>
-      </div>
-    </div>
-
+    <section class="actions">
+      <a href="dashboard.html" class="action-btn">Ver Câmeras</a>
+      <a href="config.html" class="action-btn">Configurações</a>
+    </section>
   </main>
-  
+
   <footer>
     <p>&copy; 2025 - Sistema de Monitoramento | Projeto TCC</p>
   </footer>
 
-  <script type="text/javascript" src="src/main.js"></script> 
+  <script type="text/javascript" src="src/apiClient.js"></script>
+  <script src="src/main.js"></script>
 </body>
 </html>

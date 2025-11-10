@@ -18,22 +18,24 @@
 </head>
 <body>
     <div class="box">
-        <fieldset>
-          <div class="container-global">
-       
-        <form class="formulario" action="login.php" method="post">
-        <img src="img/logo.png" width="150px" height= "150px"  alt="">
-        <label>LOGIN</label>
-        <br>
-        <input type="text" name="txtlogin" placeholder="Login" required>
-        <br>
-        <label>SENHA</label>
-        <br>
-        <input type="password" name="txtsenha" placeholder="Senha" required>
-        <br>
-        <br>
-        <input type="submit" value="ACESAR">
-</form>
+        <div class="container-global">
+            <form class="formulario" onsubmit="loginSubmit(event)">
+                <img src="img/logo.png" width="150px" height= "150px"  alt="">
+                <label>LOGIN</label>
+                <br>
+                <input type="text" id="txtlogin" placeholder="Login" required>
+                <br>
+                <label>SENHA</label>
+                <br>
+                <input type="password" id="txtsenha" placeholder="Senha" required>
+                <br>
+                <br>
+                <input type="submit" value="ACESAR">
+            </form>
+        </div>
     </div>
+
+    <script type="text/javascript" src="src/apiClient.js"></script>
+    <script type="text/javascript" src="src/login.js"></script>
 </body>
 </html>

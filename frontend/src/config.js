@@ -1,6 +1,10 @@
 // Garante que o código só roda depois que o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", () => {
 
+  if (!token){
+    window.location.href = "login.html";
+    return null;
+  }
 
   // Seletores principais
   const menuConfig = document.getElementById("menuConfig");
