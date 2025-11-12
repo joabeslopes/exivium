@@ -16,7 +16,7 @@ from sqlalchemy import select
 
 class ResourceManager():
     def __init__(self, db: Database):
-        self.resources = {}
+        self.ativos = {}
         base_path = os.path.join( os.path.dirname(sys.argv[0]), 'recursos' )
         self.plugins_path = os.path.join(base_path, 'plugins')
         self.cameras_path = os.path.join(base_path, 'cameras')
@@ -24,15 +24,25 @@ class ResourceManager():
         self.proxy_process.start()
         self.db = db
         atexit.register(self.stop_all)
-        self.start_db_resources()
+        self.start_db_ativos()
 
-    def start_db_resources(self):
+    def get_db_recursos(self):
+        query = select(Recurso)
+        recursos = {}
+        dbrecursos = self.db.get_all(query)
+        for r in dbrecursos:
+            recursos[r.id] = {
+                "nome": r.nome,
+                "tipo": r.tipo
+            }
+        return recursos
+
+    def start_db_ativos(self):
         query = select(RecursoAtivo)
         ativos = self.db.get_all(query)
         if ativos:
             for a in ativos:
-                ativo = a[0]
-                self._start(ativo.recurso_id, ativo.recurso_alvo)
+                self._start(a.recurso_id, a.recurso_alvo)
 
     def start_proxy(self):
         base = RecursoBase(-1,-1)
@@ -113,7 +123,7 @@ class ResourceManager():
 
 
     def _start(self, recurso_id, recurso_alvo) -> int:
-        self.get_all() # Começa limpando recursos inativos
+        self.get_ativos() # Começa limpando recursos inativos
 
         # Busca recurso pelo id
         query_recurso = select(Recurso).where(Recurso.id == recurso_id)
@@ -128,17 +138,6 @@ class ResourceManager():
         ).where(RecursoAtivo.recurso_id == recurso_id
         ).where(RecursoAtivo.recurso_alvo == recurso_alvo)
 
-        db_ativo = self.db.get_first(query_ativo)
-        if not db_ativo:
-            recurso_ativo = RecursoAtivo(recurso_id=recurso_id, recurso_alvo=recurso_alvo)
-            self.db.add(recurso_ativo)
-        else:
-            recurso_ativo = db_ativo
-
-        id = recurso_ativo.id
-        if id in self.resources:
-            return id
-        
         dir = self.create_dir(recurso.nome, recurso.tipo)
         if dir == "":
             return 0
@@ -148,14 +147,27 @@ class ResourceManager():
             repo = git.Repo.clone_from(git_repo_url, dir)
 
         python_file = self.install_python(dir)
+        if python_file == "":
+            return 0
+
+        db_ativo = self.db.get_first(query_ativo)
+        if not db_ativo:
+            recurso_ativo = RecursoAtivo(recurso_id=recurso_id, recurso_alvo=recurso_alvo)
+            self.db.add(recurso_ativo)
+        else:
+            recurso_ativo = db_ativo
+
+        id = recurso_ativo.id
+        if id in self.ativos:
+            return id
 
         log(f"Iniciando recurso ativo {id}")
 
-        self.resources[id] = subprocess.Popen(
+        self.ativos[id] = subprocess.Popen(
             [python_file, os.path.join(dir, "main.py"), str(id), str(recurso_alvo)]
         )
 
-        if self.resources[id].poll() is None:
+        if self.ativos[id].poll() is None:
             return id
         else:
             return 0
@@ -165,22 +177,22 @@ class ResourceManager():
         return result
 
     def _stop(self, id) -> bool:
-        self.get_all() # Começa limpando recursos inativos
+        self.get_ativos() # Começa limpando recursos inativos
 
         result = False
-        if id in self.resources:
+        if id in self.ativos:
             try:
                 log(f"Parando recurso {id}")
-                process = self.resources[id]
+                process = self.ativos[id]
                 process.terminate()
                 result = True
             except Exception as e:
                 print(e)
             finally:
-                self.get_all()
+                self.get_ativos()
         return result
 
-    def _delete(self, id):
+    def _deleta_ativo(self, id):
         query = select(RecursoAtivo).where(RecursoAtivo.id == id)
         ativo = self.db.get_first(query)
         self.db.delete(ativo)
@@ -188,27 +200,56 @@ class ResourceManager():
     async def stop_resource(self, id) -> bool:
         result = await asyncio.to_thread(self._stop, id)
         if result:
-            await asyncio.to_thread(self._delete, id)
+            await asyncio.to_thread(self._deleta_ativo, id)
+        return result
+
+    def _deleta_recurso(self, id):
+        # Começa desativando todos que usam esse recurso
+        query = select(RecursoAtivo).where(RecursoAtivo.recurso_alvo == str(id))
+        alvos = self.db.get_all(query)
+        if alvos:
+            for a in alvos:
+                self._stop(a.id)
+                self._deleta_ativo(a.id)
+
+        query = select(RecursoAtivo).where(RecursoAtivo.recurso_id == id)
+        ids = self.db.get_all(query)
+        if ids:
+            for a in ids:
+                self._stop(a.id)
+                self._deleta_ativo(a.id)
+
+        # Agora deleta de fato o recurso
+        query = select(Recurso).where(Recurso.id == id)
+        recurso = self.db.get_first(query)
+        if recurso:
+            self.db.delete(recurso)
+            return True
+        else:
+            return False
+
+    async def delete_resource(self, id) -> bool:
+        result = await asyncio.to_thread(self._deleta_recurso, id)
         return result
 
     def stop_all(self):
-        self.get_all() # Começa limpando recursos inativos
+        self.get_ativos() # Começa limpando recursos inativos
 
-        keys = list(self.resources.keys())
+        keys = list(self.ativos.keys())
 
         for id in keys:
             self._stop(id)
         self.proxy_process.terminate()
         self.db.close()
 
-    def get_all(self):
+    def get_ativos(self):
         ativos = []
-        keys = list(self.resources.keys())
+        keys = list(self.ativos.keys())
 
         for id in keys:
-            proc = self.resources[id]
+            proc = self.ativos[id]
             if proc.poll() is None:
                 ativos.append(id)
             else:
-                del self.resources[id]
+                del self.ativos[id]
         return ativos

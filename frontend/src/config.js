@@ -43,7 +43,7 @@ async function criaRecurso(event) {
     "git_repo_url": gitRepo.value
   };
 
-  const newId = await post("/recurso/new", request);
+  const newId = await post("/recurso", request);
 
   if (newId){
 
@@ -67,7 +67,23 @@ async function criaRecurso(event) {
 async function removeRecurso(event) {
   event.preventDefault();
 
+  const removeRecursoSection = document.getElementById("removeRecursoSection");
+  const removeRecursoList = removeRecursoSection.querySelector('[name="RecursoList"]');
+  const id = removeRecursoList.value;
 
+  if (recursos[id]){
+    const deleted = await del(`/recurso/${id}`);
+
+    if (deleted){
+      delete recursos[id]
+      preencheOptionsRecursos(removeRecursoSection);
+      alert("Sucesso");
+    } else {
+      alert("Erro ao deletar recurso");
+    };
+  } else {
+    alert("Não existe recurso com esse ID")
+  };
 
 };
 
@@ -85,7 +101,7 @@ async function ativaRecurso(event) {
     "recurso_alvo": alvo.value
   };
 
-  const newId = await post("/recurso", request);
+  const newId = await post("/ativo", request);
 
   if (newId){
 
@@ -110,7 +126,7 @@ async function desativaRecurso(event) {
   const desativaRecursoList = desativaRecursoSection.querySelector('[name="RecursoList"]');
   const id = desativaRecursoList.value;
 
-  const deleted = await del(`/recurso/${id}`);
+  const deleted = await del(`/ativo/${id}`);
 
   if (deleted){
     ativos = ativos.filter( (ativoId) => ativoId != id );
@@ -124,9 +140,14 @@ async function desativaRecurso(event) {
 // Garante que o código só roda depois que o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", async () => {
 
-  const ativosAtuais = await get("/recursos");
+  const ativosAtuais = await get("/ativos");
   if (ativosAtuais){
     ativos = ativosAtuais;
+  };
+
+  const recursosAtuais = await get("/recursos");
+  if (recursosAtuais){
+    recursos = recursosAtuais;
   };
 
   // Seletores principais

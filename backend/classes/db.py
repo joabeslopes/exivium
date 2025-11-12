@@ -22,12 +22,17 @@ class Database():
             self.session.commit()
 
     def get_all(self, query):
-        return self.session.execute(query).all()
+        data = self.session.execute(query).all()
+        result = [d[0] if len(d) == 1 else d for d in data]
+        return result
 
     def get_first(self, query):
         result = self.session.execute(query).first()
         if result:
-            return result[0]
+            if len(result) == 1:
+                return result[0]
+            else:
+                return result
         else:
             return None
 

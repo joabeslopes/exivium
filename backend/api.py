@@ -31,22 +31,52 @@ async def mjpeg_stream(request: Request, token: str, id: int):
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    if not id in resource_manager.resources:
+    ativos = resource_manager.get_ativos()
+    if not id in ativos:
         raise HTTPException(status_code=500, detail="Video nao disponivel")
 
     reader = Reader(id)
     return StreamingResponse(gen_frame(request, reader), media_type="multipart/x-mixed-replace; boundary=--boundary")
 
-@app.get("/recursos")
-async def get_all_cameras(token: str):
+@app.get("/ativos")
+async def get_recursos_ativos(token: str):
     info = await get_token_info(token)
     if not info:
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    return resource_manager.get_all()
+    return resource_manager.get_ativos()
 
-@app.post("/recurso/new")
+@app.post("/ativo")
+async def ativa_recurso(request: StartRecurso):
+    info = await get_token_info(request.token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    result = await resource_manager.start_resource(request.recurso_id, request.recurso_alvo)
+    return result
+
+@app.delete("/ativo/{id}")
+async def desativa_recurso(token: str, id: int):
+    info = await get_token_info(token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    result = await resource_manager.stop_resource(id)
+    return result
+
+@app.get("/recursos")
+async def get_recursos(token: str):
+    info = await get_token_info(token)
+    if not info:
+        log("[ERRO] Token invalido")
+        raise HTTPException(status_code=401, detail="Token invalido")
+
+    return resource_manager.get_db_recursos()
+
+@app.post("/recurso")
 async def cria_recurso(request: NovoRecurso):
     info = await get_token_info(request.token)
     if not info:
@@ -56,22 +86,12 @@ async def cria_recurso(request: NovoRecurso):
     result = await resource_manager.create_resource(request.nome, request.tipo, request.git_repo_url)
     return result
 
-@app.post("/recurso")
-async def cria_recurso(request: StartRecurso):
-    info = await get_token_info(request.token)
-    if not info:
-        log("[ERRO] Token invalido")
-        raise HTTPException(status_code=401, detail="Token invalido")
-
-    result = await resource_manager.start_resource(request.recurso_id, request.recurso_alvo)
-    return result
-
 @app.delete("/recurso/{id}")
-async def para_recurso(token: str, id: int):
+async def deleta_recurso(token: str, id: int):
     info = await get_token_info(token)
     if not info:
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    result = await resource_manager.stop_resource(id)
+    result = await resource_manager.delete_resource(id)
     return result

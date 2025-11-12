@@ -13,7 +13,7 @@ var STREAM_CAMERAS = [];
 
 async function getRecursos(){
 
-  const allRecursos = await get('/recursos');
+  const allRecursos = await get('/ativos');
 
   if (allRecursos){
     STREAM_CAMERAS = allRecursos;
