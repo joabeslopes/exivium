@@ -3,7 +3,31 @@ if (!token){
 };
 
 let recursos = {};
-let ativos = {};
+let ativos = [];
+
+function preencheOptionsRecursos(element){
+  const removeRecursoList = element.querySelector('[name="RecursoList"]');
+
+  removeRecursoList.innerHTML = "";
+  for (const [id, recurso] of Object.entries(recursos)){
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = recurso.nome;
+    removeRecursoList.appendChild(option);
+  };
+};
+
+function preencheOptionsAtivos(element){
+  const desativaRecursoList = element.querySelector('[name="RecursoList"]');
+
+  desativaRecursoList.innerHTML = "";
+  for (const id of ativos){
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = id;
+    desativaRecursoList.appendChild(option);
+  };
+};
 
 async function criaRecurso(event) {
   event.preventDefault();
@@ -19,18 +43,31 @@ async function criaRecurso(event) {
     "git_repo_url": gitRepo.value
   };
 
-  console.log(request);
+  const newId = await post("/recurso/new", request);
 
-  nome.value = "";
-  tipo.value = "";
-  gitRepo.value = "";
+  if (newId){
+
+    if (recursos[newId]){
+      alert("Recurso já foi criado");
+    } else {
+      recursos[newId] = {
+        "nome": request.nome
+      };
+      nome.value = "";
+      gitRepo.value = "";
+      alert("Sucesso");
+    };
+
+  } else {
+    alert("Erro ao criar recurso");
+  };
+
 };
 
 async function removeRecurso(event) {
   event.preventDefault();
 
-  const removeRecursoSection = document.getElementById("removeRecursoSection");
-  const recursoList = removeRecursoSection.querySelector('[name="RecursoList"]')[0];
+
 
 };
 
@@ -38,7 +75,31 @@ async function ativaRecurso(event) {
   event.preventDefault();
 
   const ativaRecursoSection = document.getElementById("ativaRecursoSection");
-  const recursoList = ativaRecursoSection.querySelector('[name="RecursoList"]')[0];
+  const ativaRecursoList = ativaRecursoSection.querySelector('[name="RecursoList"]');
+  const id = ativaRecursoList.value;
+  const alvo = document.getElementById("RecursoAlvo");  
+
+  const request = {
+    "token": token,
+    "recurso_id": id,
+    "recurso_alvo": alvo.value
+  };
+
+  const newId = await post("/recurso", request);
+
+  if (newId){
+
+    if (!ativos.includes(newId)){
+      ativos.push(newId);
+      alvo.value = "";
+      alert("Sucesso");
+    } else {
+      alert("Recurso já foi ativado");
+    };
+
+  } else {
+    alert("Erro ao criar recurso");
+  };
 
 };
 
@@ -46,13 +107,27 @@ async function desativaRecurso(event) {
   event.preventDefault();
 
   const desativaRecursoSection = document.getElementById("desativaRecursoSection");
-  const recursoList = desativaRecursoSection.querySelector('[name="RecursoList"]')[0];
+  const desativaRecursoList = desativaRecursoSection.querySelector('[name="RecursoList"]');
+  const id = desativaRecursoList.value;
 
+  const deleted = await del(`/recurso/${id}`);
 
+  if (deleted){
+    ativos = ativos.filter( (ativoId) => ativoId != id );
+    preencheOptionsAtivos(desativaRecursoSection);
+    alert("Sucesso");
+  } else {
+    alert("Erro ao criar recurso");
+  };
 };
 
 // Garante que o código só roda depois que o DOM estiver pronto
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+
+  const ativosAtuais = await get("/recursos");
+  if (ativosAtuais){
+    ativos = ativosAtuais;
+  };
 
   // Seletores principais
   const menuConfig = document.getElementById("menuConfig");
@@ -104,6 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addRecursoSection.classList.add("hidden");
     ativaRecursoSection.classList.add("hidden");
     desativaRecursoSection.classList.add("hidden");
+
+    preencheOptionsRecursos(removeRecursoSection);
   });
 
   // Ativar recurso
@@ -113,6 +190,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addRecursoSection.classList.add("hidden");
     removeRecursoSection.classList.add("hidden");
     desativaRecursoSection.classList.add("hidden");
+
+    preencheOptionsRecursos(ativaRecursoSection);
   });
 
   // Desativar recurso
@@ -122,6 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addRecursoSection.classList.add("hidden");
     removeRecursoSection.classList.add("hidden");
     ativaRecursoSection.classList.add("hidden");
+
+    preencheOptionsAtivos(desativaRecursoSection);
   });
 
   // Voltar ao menu principal

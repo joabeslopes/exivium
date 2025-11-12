@@ -52,7 +52,7 @@
     </form>
 
     <!-- FORMULÁRIO REMOVER -->
-    <form id="removeRecursoSection" class="config-section hidden" onsubmit="">
+    <form id="removeRecursoSection" class="config-section hidden" onsubmit="removeRecurso(event)">
       <h2>❌ Remover Recurso</h2>
       <select class="input" name="RecursoList" class="recurso-list" required></select>
       <button type="submit">Remover</button>
@@ -60,7 +60,7 @@
     </form>
 
     <!-- FORMULÁRIO ATIVAR -->
-    <form id="ativaRecursoSection" class="config-section hidden" onsubmit="">
+    <form id="ativaRecursoSection" class="config-section hidden" onsubmit="ativaRecurso(event)">
       <h2>🟢 Ativar Recurso</h2>
       <select class="input" name="RecursoList" class="recurso-list" required></select>
       <label>Alvo do recurso</label>
@@ -70,7 +70,7 @@
     </form>
 
     <!-- FORMULÁRIO DESATIVAR -->
-    <form id="desativaRecursoSection" class="config-section hidden" onsubmit="">
+    <form id="desativaRecursoSection" class="config-section hidden" onsubmit="desativaRecurso(event)">
       <h2>🔴 Desativar Recurso</h2>
       <select class="input" name="RecursoList" class="recurso-list" required></select>
       <button type="submit">Desativar</button>
