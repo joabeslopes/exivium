@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Configurações - Sistema de Monitoramento</title>
   <link rel="stylesheet" href="css/config.css">
-  <script src="js/auth.js"></script>
 </head>
 <body>
 
@@ -14,41 +13,69 @@
       <img src="img/logo.png" alt="Logo">
       <h1>Configurações do Sistema</h1>
     </div>
-    <button id="logoutBtn">Sair</button>
+    <nav>
+      <button class="navButton" id="voltarBtn">Voltar</button>
+      <button class="navButton" id="logoutBtn">Sair</button>
+    </nav>
   </header>
 
   <main class="config-container">
-    
+
     <!-- MENU PRINCIPAL -->
     <section id="menuConfig" class="config-section">
       <h2>⚙️ Escolha uma Opção</h2>
       <div class="menu-buttons">
-        <button id="btnAddCamera">➕ Adicionar Câmera</button>
-        <button id="btnRemoveCamera">❌ Remover Câmera</button>
+        <button id="btnAddRecurso">➕ Criar Recurso</button>
+        <button id="btnRemoveRecurso">❌ Remover Recurso</button>
+        <button id="btnAtivaRecurso">🟢 Ativar Recurso</button>
+        <button id="btnDesativaRecurso">🔴 Desativar Recurso</button>
       </div>
     </section>
 
-    <!-- FORMULÁRIO ADICIONAR -->
-    <section id="addCameraSection" class="config-section hidden">
-      <h2>➕ Adicionar Nova Câmera</h2>
-      <form id="addCameraForm">
-        <label>Nome da Câmera</label>
-        <input type="text" id="cameraName" placeholder="Ex: Entrada Principal" required>
+    <!-- FORMULÁRIO CRIAR -->
+    <form id="addRecursoSection" class="config-section hidden" onsubmit="criaRecurso(event)">
+      <h2>➕ Criar Recurso</h2>
+      <label>Nome do recurso</label>
+      <input class="input" type="text" id="RecursoNome" placeholder="Ex: Entrada Principal" required>
 
-        <label>Endereço IP / URL</label>
-        <input type="text" id="cameraUrl" placeholder="Ex: rtsp://192.168.0.10/stream" required>
+      <label>Tipo</label>
+      <select class="input" id="RecursoTipo" required>
+        <option value="camera" selected>Camera</option>
+        <option value="plugin">Plugin</option>
+      </select>
 
-        <button type="submit">Salvar Câmera</button>
-        <button type="button" class="btnVoltar">Voltar</button>
-      </form>
-    </section>
+      <label>Repositório git (opcional)</label>
+      <input class="input" type="text" id="RecursoGitRepo" placeholder="Ex: https://github.com/joabeslopes/exivium-primeiro-plugin">
 
-    <!-- LISTA REMOVER -->
-    <section id="removeCameraSection" class="config-section hidden">
-      <h2>❌ Remover Câmeras</h2>
-      <div id="cameraList" class="camera-list"></div>
+      <button type="submit">Criar</button>
       <button type="button" class="btnVoltar">Voltar</button>
-    </section>
+    </form>
+
+    <!-- FORMULÁRIO REMOVER -->
+    <form id="removeRecursoSection" class="config-section hidden" onsubmit="">
+      <h2>❌ Remover Recurso</h2>
+      <select class="input" name="RecursoList" class="recurso-list" required></select>
+      <button type="submit">Remover</button>
+      <button type="button" class="btnVoltar">Voltar</button>
+    </form>
+
+    <!-- FORMULÁRIO ATIVAR -->
+    <form id="ativaRecursoSection" class="config-section hidden" onsubmit="">
+      <h2>🟢 Ativar Recurso</h2>
+      <select class="input" name="RecursoList" class="recurso-list" required></select>
+      <label>Alvo do recurso</label>
+      <input class="input" type="text" id="RecursoAlvo" placeholder="Ex: rtsp://localhost/camerastream" required>
+      <button type="submit">Ativar</button>
+      <button type="button" class="btnVoltar">Voltar</button>
+    </form>
+
+    <!-- FORMULÁRIO DESATIVAR -->
+    <form id="desativaRecursoSection" class="config-section hidden" onsubmit="">
+      <h2>🔴 Desativar Recurso</h2>
+      <select class="input" name="RecursoList" class="recurso-list" required></select>
+      <button type="submit">Desativar</button>
+      <button type="button" class="btnVoltar">Voltar</button>
+    </form>
 
   </main>
 
@@ -57,6 +84,6 @@
   </footer>
 
   <script type="text/javascript" src="src/apiClient.js"></script>
-  <script src="src/config.js"></script>
+  <script type="text/javascript" src="src/config.js"></script>
 </body>
 </html>

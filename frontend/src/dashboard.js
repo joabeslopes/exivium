@@ -1,8 +1,13 @@
+if (!token){
+  window.location.href = "login.html";
+};
+
 // Seleção de elementos
 const cameraCountSelect = document.getElementById('cameraCount');
 const header = document.querySelector('header');
 const cameraGrid = document.querySelector('.camera-grid');
 const logoutBtn = document.getElementById('logoutBtn');
+const voltarBtn = document.getElementById('voltarBtn');
 
 var STREAM_CAMERAS = [];
 
@@ -110,34 +115,29 @@ function handleFullscreen(event) {
   }
 }
 
-// Listener para gerenciar a visibilidade do cabeçalho
-document.addEventListener('fullscreenchange', () => {
-  if (document.fullscreenElement) {
-    // Entrou em tela cheia
-    header.classList.add('hidden-on-fullscreen');
-  } else {
-    // Saiu de tela cheia
-    header.classList.remove('hidden-on-fullscreen');
-  }
-});
 
-
-// Event listener para mudança no select
-cameraCountSelect.addEventListener('change', (e) => {
-  const selectedCount = parseInt(e.target.value);
-  updateCameraDisplay(selectedCount);
-});
-
-// Carregar preferência salva ao iniciar a página
+// Carregar ao iniciar a página
 window.addEventListener('DOMContentLoaded', async () => {
-
-  if (token == null){
-    window.location.href = "login.html"
-    return null;
-  };
 
   await getRecursos();
   const savedCount = localStorage.getItem('cameraCount');
+
+  // Listener para gerenciar a visibilidade do cabeçalho
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+      // Entrou em tela cheia
+      header.classList.add('hidden-on-fullscreen');
+    } else {
+      // Saiu de tela cheia
+      header.classList.remove('hidden-on-fullscreen');
+    }
+  });
+
+  // Event listener para mudança no select
+  cameraCountSelect.addEventListener('change', (e) => {
+    const selectedCount = parseInt(e.target.value);
+    updateCameraDisplay(selectedCount);
+  });
 
   if (savedCount) {
     cameraCountSelect.value = savedCount;
@@ -152,17 +152,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     button.addEventListener('click', handleFullscreen);
   });
 
-});
-
-// Função de logout
-logoutBtn.addEventListener('click', () => {
-  const confirmLogout = confirm('Deseja realmente sair do sistema?');
-  
-  if (confirmLogout) {
-    // Limpar dados salvos
-    localStorage.clear();
+  // Função de logout
+  logoutBtn.addEventListener('click', () => {
+    const confirmLogout = confirm('Deseja realmente sair do sistema?');
     
-    // Redirecionar para página de login
-    window.location.href = 'login.html';
-  }
+    if (confirmLogout) {
+      // Limpar dados salvos
+      localStorage.clear();
+      
+      // Redirecionar para página de login
+      window.location.href = 'login.html';
+    }
+  });
+
+  // Função de voltar
+  voltarBtn.addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+
 });

@@ -1,16 +1,29 @@
+if (!token){
+  window.location.href = "login.html"
+};
 
 // Espera o DOM carregar para aplicar o efeito de fade-in
 window.addEventListener("DOMContentLoaded", () => {
-
-  if (token == null){
-    window.location.href = "login.html"
-    return null;
-  };
 
   document.body.classList.add("loaded");
 
   // Exibe o nome do usuário (pode vir do backend futuramente)
   document.getElementById("userName").textContent = "Rafael";
+
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  // Função de logout
+  logoutBtn.addEventListener('click', () => {
+    const confirmLogout = confirm('Deseja realmente sair do sistema?');
+
+    if (confirmLogout) {
+      // Limpar dados salvos
+      localStorage.clear();
+
+      // Redirecionar para página de login (ajuste o caminho conforme necessário)
+      window.location.href = 'login.html';
+    }
+  });
 });
 
 // Função genérica de transição suave entre páginas
@@ -30,16 +43,3 @@ function goToCameras() {
 function goToConfig() {
   fadeAndRedirect("config.html");
 }
-
-/// Função de logout
-logoutBtn.addEventListener('click', () => {
-  const confirmLogout = confirm('Deseja realmente sair do sistema?');
-  
-  if (confirmLogout) {
-    // Limpar dados salvos
-    localStorage.clear();
-    
-    // Redirecionar para página de login (ajuste o caminho conforme necessário)
-     window.location.href = 'login.html';
-  }
-});
