@@ -5,10 +5,12 @@ if (!token){
 // Espera o DOM carregar para aplicar o efeito de fade-in
 window.addEventListener("DOMContentLoaded", () => {
 
+  const userData = JSON.parse(localStorage.getItem('userData'));
+
   document.body.classList.add("loaded");
 
-  // Exibe o nome do usuário (pode vir do backend futuramente)
-  document.getElementById("userName").textContent = "Rafael";
+  // Exibe o nome do usuário
+  document.getElementById("userName").textContent = userData.nome;
 
   const logoutBtn = document.getElementById("logoutBtn");
 

@@ -6,26 +6,26 @@ let recursos = {};
 let ativos = [];
 
 function preencheOptionsRecursos(element){
-  const removeRecursoList = element.querySelector('[name="RecursoList"]');
+  const recursoList = element.querySelector('[name="RecursoList"]');
 
-  removeRecursoList.innerHTML = "";
+  recursoList.innerHTML = "";
   for (const [id, recurso] of Object.entries(recursos)){
     const option = document.createElement("option");
     option.value = id;
     option.textContent = recurso.nome;
-    removeRecursoList.appendChild(option);
+    recursoList.appendChild(option);
   };
 };
 
 function preencheOptionsAtivos(element){
-  const desativaRecursoList = element.querySelector('[name="RecursoList"]');
+  const recursoList = element.querySelector('[name="RecursoList"]');
 
-  desativaRecursoList.innerHTML = "";
+  recursoList.innerHTML = "";
   for (const id of ativos){
     const option = document.createElement("option");
     option.value = id;
     option.textContent = id;
-    desativaRecursoList.appendChild(option);
+    recursoList.appendChild(option);
   };
 };
 
@@ -35,6 +35,7 @@ async function criaRecurso(event) {
   const nome = document.getElementById("RecursoNome");
   const tipo = document.getElementById("RecursoTipo");
   const gitRepo = document.getElementById("RecursoGitRepo");
+  const spinner = document.getElementById("LoadingSpinner");
 
   const request = {
     "token": token,
@@ -43,7 +44,11 @@ async function criaRecurso(event) {
     "git_repo_url": gitRepo.value
   };
 
+  spinner.classList.remove("hidden");
+
   const newId = await post("/recurso", request);
+
+  spinner.classList.add("hidden");
 
   if (newId){
 

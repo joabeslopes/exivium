@@ -1,11 +1,22 @@
 async function loginSubmit(event){
     event.preventDefault();
 
-    const login = document.getElementById("txtlogin");
-    const senha = document.getElementById("txtsenha");
+    const email = document.getElementById("txtEmail");
+    const senha = document.getElementById("txtSenha");
 
-    const token = 'meu_token';
+    const request = {
+        "email": email.value,
+        "senha": senha.value
+    };
 
-    localStorage.setItem('token', token);
-    window.location.href = "index.html";
-}
+    const userData = await post("/token", request);
+
+    if (userData){
+        localStorage.setItem('token', userData.token);
+        delete userData.token;
+        localStorage.setItem('userData', JSON.stringify(userData));
+        window.location.href = "index.html";
+    } else {
+        alert("Falha no login");
+    };
+};

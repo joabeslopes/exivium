@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuários - Sistema de Monitoramento</title>
+  <link rel="stylesheet" href="css/usuarios.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="img/logo.png" alt="Logo">
+      <h1>Configurações do Sistema</h1>
+    </div>
+    <nav>
+      <button class="navButton" id="voltarBtn">Voltar</button>
+      <button class="navButton" id="logoutBtn">Sair</button>
+    </nav>
+  </header>
+
+  <main class="config-container">
+
+    <!-- MENU PRINCIPAL -->
+    <section id="menuConfig" class="config-section">
+      <h2>⚙️ Escolha uma Opção</h2>
+      <div class="menu-buttons">
+        <button id="btnAddUsuario">➕ Criar Usuario</button>
+        <button id="btnRemoveUsuario">❌ Remover Usuario</button>
+      </div>
+    </section>
+
+    <!-- FORMULÁRIO CRIAR -->
+    <form id="addUsuarioSection" class="config-section hidden" onsubmit="criaUsuario(event)">
+      <h2>➕ Criar Usuario</h2>
+      <label>Nome</label>
+      <input class="input" type="text" id="UsuarioNome" placeholder="Ex: Fulano" required>
+
+      <label>Telefone (Opcional)</label>
+      <input class="input" type="text" id="UsuarioTelefone" placeholder="Ex: 17-99999-9999">
+
+      <label>Email</label>
+      <input class="input" type="text" id="UsuarioEmail" placeholder="Ex: fulano@exemplo.com" required>
+
+      <label>Senha</label>
+      <input class="input" type="password" id="UsuarioSenha" required>
+
+      <button type="submit">Criar</button>
+      <button type="button" class="btnVoltar">Voltar</button>
+    </form>
+
+    <!-- FORMULÁRIO REMOVER -->
+    <form id="removeUsuarioSection" class="config-section hidden" onsubmit="removeUsuario(event)">
+      <h2>❌ Remover Usuario</h2>
+      <select class="input" name="UsuarioList" class="usuario-list" required></select>
+      <button type="submit">Remover</button>
+      <button type="button" class="btnVoltar">Voltar</button>
+    </form>
+
+  </main>
+
+  <footer>
+    <p>&copy; 2025 - Sistema de Monitoramento | Projeto TCC</p>
+  </footer>
+
+  <script type="text/javascript" src="src/apiClient.js"></script>
+  <script type="text/javascript" src="src/usuarios.js"></script>
+</body>
+</html>

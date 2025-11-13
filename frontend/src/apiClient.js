@@ -13,7 +13,13 @@ async function post(path, requestBody) {
             },
             body: JSON.stringify(requestBody)
         }
-        ).then(response => response.json()
+        ).then(response => {
+            if (response.ok){
+                return response.json();
+            } else {
+                return null;
+            };
+        }
         ).catch(error => null);
 
     return apiResponse;
@@ -22,7 +28,13 @@ async function post(path, requestBody) {
 async function get(path) {
 
     const apiResponse = await fetch(apiUrl + path + `?token=${token}`
-        ).then(response => response.json()
+        ).then(response => {
+            if (response.ok){
+                return response.json();
+            } else {
+                return null;
+            };
+        }
         ).catch(error => null);
 
     return apiResponse;
@@ -34,7 +46,13 @@ async function del(path) {
         {
             method: "DELETE",
         }
-        ).then(response => response.json()
+        ).then(response => {
+            if (response.ok){
+                return response.json();
+            } else {
+                return null;
+            };
+        }
         ).catch(error => null);
 
     return apiResponse;
