@@ -42,7 +42,7 @@ O sistema foi projetado para suportar módulos independentes, chamados de "Recur
 
 É recomendado utilizar o Docker para rodar o sistema. Para isso, basta ir na raiz do projeto e rodar **docker compose up -d** que ele já vai construir a imagem do backend, e também rodar o banco de dados e o nginx para servir o frontend.
 
-Na pasta **backend** você deve criar o arquivo **.env** e definir algumas variáveis de ambiente que serão usadas pelos recursos, como por exemplo:
+Na pasta **backend** você deve criar os arquivos **exivium.log** e **.env** e definir nesse arquivo .env algumas variáveis de ambiente que serão usadas pelos containers, como por exemplo:
 
 >FPS=30
 >
@@ -51,6 +51,24 @@ Na pasta **backend** você deve criar o arquivo **.env** e definir algumas vari�
 >FRAME_HEIGHT=480
 >
 >JPEG_QUALITY=70
+>
+>DATABASE_URL=postgresql+psycopg://usuario:senha@db:5432/banco
+>
+>POSTGRES_DB=banco
+>
+>POSTGRES_USER=usuario
+>
+>POSTGRES_PASSWORD=senha
+>
+>JWT_SECRET_KEY=chavesecretaaleatoria
+>
+>JWT_EXPIRE_MINUTES=60
+>
+>JWT_ALGORITHM=HS256
+>
+>EXIVIUM_ADMIN_EMAIL=admin
+>
+>EXIVIUM_ADMIN_PASSWORD=admin
 
 ---
 
