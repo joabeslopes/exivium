@@ -40,3 +40,6 @@ class Database():
         if model:
             self.session.delete(model)
             self.session.commit()
+            return True
+        else:
+            return False

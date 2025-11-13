@@ -1,7 +1,6 @@
 import os
 import venv
 import subprocess
-import signal
 import git
 import atexit
 import zmq
@@ -13,6 +12,7 @@ import asyncio
 from classes.db import Database
 from classes.models import RecursoAtivo, Recurso
 from sqlalchemy import select
+import shutil
 
 class ResourceManager():
     def __init__(self, db: Database):
@@ -205,24 +205,25 @@ class ResourceManager():
 
     def _deleta_recurso(self, id):
         # Começa desativando todos que usam esse recurso
-        query = select(RecursoAtivo).where(RecursoAtivo.recurso_alvo == str(id))
-        alvos = self.db.get_all(query)
-        if alvos:
-            for a in alvos:
-                self._stop(a.id)
-                self._deleta_ativo(a.id)
-
         query = select(RecursoAtivo).where(RecursoAtivo.recurso_id == id)
-        ids = self.db.get_all(query)
-        if ids:
-            for a in ids:
-                self._stop(a.id)
-                self._deleta_ativo(a.id)
+        ativos = self.db.get_all(query)
+        if ativos:
+            for ativo in ativos:
+                interQuery = select(RecursoAtivo).where(RecursoAtivo.recurso_alvo == str(ativo.id))
+                consumers = self.db.get_all(interQuery)
+                if consumers:
+                    for consumer in consumers:
+                        self._stop(consumer.id)
+                        self._deleta_ativo(consumer.id)
+                self._stop(ativo.id)
+                self._deleta_ativo(ativo.id)
 
         # Agora deleta de fato o recurso
         query = select(Recurso).where(Recurso.id == id)
         recurso = self.db.get_first(query)
         if recurso:
+            dir = self.create_dir(recurso.nome, recurso.tipo)
+            shutil.rmtree(dir, ignore_errors=True)
             self.db.delete(recurso)
             return True
         else:
@@ -251,5 +252,6 @@ class ResourceManager():
             if proc.poll() is None:
                 ativos.append(id)
             else:
+                self._deleta_ativo(id)
                 del self.ativos[id]
         return ativos

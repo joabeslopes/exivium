@@ -11,3 +11,14 @@ class NovoRecurso(BaseModel):
     nome: str
     tipo: str
     git_repo_url: Optional[str] = ""
+
+class NovoUsuario(BaseModel):
+    token: str
+    nome: str
+    telefone: Optional[str] = ""
+    email: str
+    senha: str
+
+class ObtemToken(BaseModel):
+    email: str
+    senha: str

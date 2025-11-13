@@ -25,6 +25,7 @@ services:
     volumes:
       - "./backend/recursos/plugins:/exivium/recursos/plugins"
       - "./backend/recursos/cameras:/exivium/recursos/cameras"
+      - "./backend/exivium.log:/exivium/exivium.log"
 
   nginx:
     image: nginx:1.28.0-bookworm
@@ -36,7 +37,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./frontend:/var/www/frontend:ro
-      - ./nginx/ssl:/etc/nginx/ssl/:ro
+      # - ./nginx/ssl:/etc/nginx/ssl/:ro
 
 volumes:
   db-data:
