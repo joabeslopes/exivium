@@ -19,7 +19,8 @@ services:
       context: "./backend"
     image: "exivium/backend:1.0"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - "./backend/.env"
     volumes:
