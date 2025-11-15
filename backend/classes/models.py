@@ -32,4 +32,5 @@ class RecursoAtivo(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     recurso_id: Mapped[int] = mapped_column(Integer, nullable=False)
     recurso_alvo: Mapped[str] = mapped_column(Text, nullable=False)
+    descricao: Mapped[str] = mapped_column(Text, nullable=False)
     data_criacao: Mapped[datetime] = mapped_column( DateTime(timezone=True), server_default=func.now() )

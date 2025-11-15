@@ -5,6 +5,7 @@ class StartRecurso(BaseModel):
     token: str
     recurso_id: int
     recurso_alvo: str
+    descricao: str
 
 class NovoRecurso(BaseModel):
     token: str

@@ -37,12 +37,24 @@ class ResourceManager():
             }
         return recursos
 
+    def get_db_ativos(self):
+        ativos = self.get_ativos()
+        query = select(RecursoAtivo).where(RecursoAtivo.id.in_(ativos))
+        dbativos = self.db.get_all(query)
+        result = {}
+        for ativo in dbativos:
+            result[ativo.id] = {
+                "recurso_alvo": ativo.recurso_alvo,
+                "descricao": ativo.descricao
+            }
+        return result
+
     def start_db_ativos(self):
         query = select(RecursoAtivo)
         ativos = self.db.get_all(query)
         if ativos:
             for a in ativos:
-                self._start(a.recurso_id, a.recurso_alvo)
+                self._start(a.recurso_id, a.recurso_alvo, a.descricao)
 
     def start_proxy(self):
         base = RecursoBase(-1,-1)
@@ -122,7 +134,7 @@ class ResourceManager():
         return result
 
 
-    def _start(self, recurso_id, recurso_alvo) -> int:
+    def _start(self, recurso_id, recurso_alvo, descricao) -> int:
         self.get_ativos() # Começa limpando recursos inativos
 
         # Busca recurso pelo id
@@ -152,7 +164,7 @@ class ResourceManager():
 
         db_ativo = self.db.get_first(query_ativo)
         if not db_ativo:
-            recurso_ativo = RecursoAtivo(recurso_id=recurso_id, recurso_alvo=recurso_alvo)
+            recurso_ativo = RecursoAtivo(recurso_id=recurso_id, recurso_alvo=recurso_alvo, descricao=descricao)
             self.db.add(recurso_ativo)
         else:
             recurso_ativo = db_ativo
@@ -172,8 +184,8 @@ class ResourceManager():
         else:
             return 0
 
-    async def start_resource(self, recurso_id: int, recurso_alvo) -> int:
-        result = await asyncio.to_thread(self._start, recurso_id, recurso_alvo)
+    async def start_resource(self, recurso_id: int, recurso_alvo, descricao:str="") -> int:
+        result = await asyncio.to_thread(self._start, recurso_id, recurso_alvo, descricao)
         return result
 
     def _stop(self, id) -> bool:
@@ -208,15 +220,18 @@ class ResourceManager():
         query = select(RecursoAtivo).where(RecursoAtivo.recurso_id == id)
         ativos = self.db.get_all(query)
         if ativos:
+            ativos_deletar = {}
             for ativo in ativos:
                 interQuery = select(RecursoAtivo).where(RecursoAtivo.recurso_alvo == str(ativo.id))
                 consumers = self.db.get_all(interQuery)
                 if consumers:
                     for consumer in consumers:
-                        self._stop(consumer.id)
-                        self._deleta_ativo(consumer.id)
-                self._stop(ativo.id)
-                self._deleta_ativo(ativo.id)
+                        ativos_deletar[consumer.id] = True
+                ativos_deletar[ativo.id] = True
+            # Deleta todos do ultimo ate o primeiro
+            for del_id in sorted(ativos_deletar.keys(), reverse=True):
+                self._stop(del_id)
+                self._deleta_ativo(del_id)
 
         # Agora deleta de fato o recurso
         query = select(Recurso).where(Recurso.id == id)
@@ -234,8 +249,9 @@ class ResourceManager():
         return result
 
     def stop_all(self):
+        log("Encerrando recursos")
+        
         self.get_ativos() # Começa limpando recursos inativos
-
         keys = list(self.ativos.keys())
 
         for id in keys:

@@ -44,7 +44,7 @@ async def get_recursos_ativos(token: str):
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    return resource_manager.get_ativos()
+    return resource_manager.get_db_ativos()
 
 @app.post("/ativo")
 async def ativa_recurso(request: StartRecurso):
@@ -52,7 +52,7 @@ async def ativa_recurso(request: StartRecurso):
         log("[ERRO] Token invalido")
         raise HTTPException(status_code=401, detail="Token invalido")
 
-    result = await resource_manager.start_resource(request.recurso_id, request.recurso_alvo)
+    result = await resource_manager.start_resource(request.recurso_id, request.recurso_alvo, request.descricao)
     return result
 
 @app.delete("/ativo/{id}")
