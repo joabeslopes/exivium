@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Configurações - Sistema de Monitoramento</title>
+  <link rel="stylesheet" href="css/default.css">
   <link rel="stylesheet" href="css/config.css">
 </head>
 <body>
@@ -39,7 +40,7 @@
       <input class="input" type="text" id="RecursoNome" placeholder="Ex: Entrada Principal" required>
 
       <label>Tipo</label>
-      <select class="input" id="RecursoTipo" required>
+      <select id="RecursoTipo" required>
         <option value="camera" selected>Camera</option>
         <option value="plugin">Plugin</option>
       </select>
@@ -58,7 +59,7 @@
     <!-- FORMULÁRIO REMOVER -->
     <form id="removeRecursoSection" class="config-section hidden" onsubmit="removeRecurso(event)">
       <h2>❌ Remover Recurso</h2>
-      <select class="input" name="RecursoList" class="recurso-list" required></select>
+      <select name="RecursoList" class="recurso-list" required></select>
       <div class="loading-spinner">
         <div name="LoadingSpinner" class="spinner-ring hidden"></div>
       </div>
@@ -69,11 +70,11 @@
     <!-- FORMULÁRIO ATIVAR -->
     <form id="ativaRecursoSection" class="config-section hidden" onsubmit="ativaRecurso(event)">
       <h2>🟢 Ativar Recurso</h2>
-      <select class="input" name="RecursoList" class="recurso-list" required></select>
+      <select name="RecursoList" class="recurso-list" required></select>
       <label>Alvo do recurso</label>
       <input class="input" type="text" id="RecursoAlvo" placeholder="Ex: rtsp://localhost/camerastream" required>
       <label>Ativos atuais (para consulta)</label>
-      <select class="input" name="AtivoList" class="recurso-list"></select>
+      <select name="AtivoList" class="recurso-list"></select>
       <label>Descrição</label>
       <input class="input" type="text" id="RecursoDescricao" required>
       <button type="submit">Ativar</button>
@@ -83,7 +84,7 @@
     <!-- FORMULÁRIO DESATIVAR -->
     <form id="desativaRecursoSection" class="config-section hidden" onsubmit="desativaRecurso(event)">
       <h2>🔴 Desativar Recurso</h2>
-      <select class="input" name="AtivoList" class="recurso-list" required></select>
+      <select name="AtivoList" class="recurso-list" required></select>
       <button type="submit">Desativar</button>
       <button type="button" class="btnVoltar">Voltar</button>
     </form>

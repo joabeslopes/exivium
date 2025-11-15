@@ -1,10 +1,3 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 /*Fundo principal*/
 body {
   height: 633px;
@@ -14,7 +7,6 @@ body {
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
   color: #fff;
 }
-
 
 .container-global {
   display: flex;
@@ -26,8 +18,6 @@ body {
 
 /*Formulário*/
 .formulario {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   text-align: center;
   width: 320px;
@@ -49,7 +39,6 @@ body {
   margin-bottom: 20px;
 }
 
-
 .formulario label {
   font-size: 20px;
   font-weight: bold;
@@ -58,44 +47,21 @@ body {
 }
 
 /*Campos*/
-.formulario input[type="text"],
-.formulario input[type="password"] {
+.input {
   width: 100%;
-  height: 35px;
-  margin-bottom: 15px;
-  border: none;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
   font-size: 1rem;
-  padding-left: 10px;
   outline: none;
-  transition: background 0.3s ease;
+  transition: 0.3s ease;
 }
 
-.formulario input[type="text"]:focus,
-.formulario input[type="password"]:focus {
+.input:focus {
   background: rgba(131, 83, 83, 0.25);
 }
 
 /*Botão ACESSAR*/
-.formulario input[type="submit"] {
+.formulario button[type="submit"] {
   width: 100%;
   height: 40px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.formulario input[type="submit"]:hover {
-  background: linear-gradient(135deg, #0072ff, #00c6ff);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
 }
 
 /*Responsividade*/
