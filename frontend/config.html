@@ -48,7 +48,7 @@
       <input class="input" type="text" id="RecursoGitRepo" placeholder="Ex: https://github.com/joabeslopes/exivium-primeiro-plugin">
 
       <div class="loading-spinner">
-        <div id="LoadingSpinner" class="spinner-ring hidden"></div>
+        <div name="LoadingSpinner" class="spinner-ring hidden"></div>
       </div>
 
       <button type="submit">Criar</button>
@@ -59,6 +59,9 @@
     <form id="removeRecursoSection" class="config-section hidden" onsubmit="removeRecurso(event)">
       <h2>❌ Remover Recurso</h2>
       <select class="input" name="RecursoList" class="recurso-list" required></select>
+      <div class="loading-spinner">
+        <div name="LoadingSpinner" class="spinner-ring hidden"></div>
+      </div>
       <button type="submit">Remover</button>
       <button type="button" class="btnVoltar">Voltar</button>
     </form>
@@ -69,6 +72,10 @@
       <select class="input" name="RecursoList" class="recurso-list" required></select>
       <label>Alvo do recurso</label>
       <input class="input" type="text" id="RecursoAlvo" placeholder="Ex: rtsp://localhost/camerastream" required>
+      <label>Ativos atuais (para consulta)</label>
+      <select class="input" name="AtivoList" class="recurso-list"></select>
+      <label>Descrição</label>
+      <input class="input" type="text" id="RecursoDescricao" required>
       <button type="submit">Ativar</button>
       <button type="button" class="btnVoltar">Voltar</button>
     </form>
@@ -76,7 +83,7 @@
     <!-- FORMULÁRIO DESATIVAR -->
     <form id="desativaRecursoSection" class="config-section hidden" onsubmit="desativaRecurso(event)">
       <h2>🔴 Desativar Recurso</h2>
-      <select class="input" name="RecursoList" class="recurso-list" required></select>
+      <select class="input" name="AtivoList" class="recurso-list" required></select>
       <button type="submit">Desativar</button>
       <button type="button" class="btnVoltar">Voltar</button>
     </form>

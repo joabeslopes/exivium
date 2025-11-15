@@ -16,7 +16,7 @@ async function getRecursos(){
   const allRecursos = await get('/ativos');
 
   if (allRecursos){
-    STREAM_CAMERAS = allRecursos;
+    STREAM_CAMERAS = Object.keys(allRecursos);
   };
 
 };

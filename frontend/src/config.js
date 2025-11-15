@@ -3,7 +3,7 @@ if (!token){
 };
 
 let recursos = {};
-let ativos = [];
+let ativos = {};
 
 function preencheOptionsRecursos(element){
   const recursoList = element.querySelector('[name="RecursoList"]');
@@ -18,24 +18,24 @@ function preencheOptionsRecursos(element){
 };
 
 function preencheOptionsAtivos(element){
-  const recursoList = element.querySelector('[name="RecursoList"]');
+  const recursoList = element.querySelector('[name="AtivoList"]');
 
   recursoList.innerHTML = "";
-  for (const id of ativos){
+  for (const [id, ativo] of Object.entries(ativos)){
     const option = document.createElement("option");
     option.value = id;
-    option.textContent = id;
+    option.textContent = `${id} - ${ativo.descricao}`;
     recursoList.appendChild(option);
   };
 };
 
 async function criaRecurso(event) {
   event.preventDefault();
-
+  const addRecursoSection = document.getElementById("addRecursoSection");
   const nome = document.getElementById("RecursoNome");
   const tipo = document.getElementById("RecursoTipo");
   const gitRepo = document.getElementById("RecursoGitRepo");
-  const spinner = document.getElementById("LoadingSpinner");
+  const spinner = addRecursoSection.querySelector('[name="LoadingSpinner"]');
 
   const request = {
     "token": token,
@@ -75,9 +75,14 @@ async function removeRecurso(event) {
   const removeRecursoSection = document.getElementById("removeRecursoSection");
   const removeRecursoList = removeRecursoSection.querySelector('[name="RecursoList"]');
   const id = removeRecursoList.value;
+  const spinner = removeRecursoSection.querySelector('[name="LoadingSpinner"]');
 
   if (recursos[id]){
+    spinner.classList.remove("hidden");
+
     const deleted = await del(`/recurso/${id}`);
+  
+    spinner.classList.add("hidden");
 
     if (deleted){
       delete recursos[id]
@@ -98,21 +103,25 @@ async function ativaRecurso(event) {
   const ativaRecursoSection = document.getElementById("ativaRecursoSection");
   const ativaRecursoList = ativaRecursoSection.querySelector('[name="RecursoList"]');
   const id = ativaRecursoList.value;
-  const alvo = document.getElementById("RecursoAlvo");  
+  const alvo = document.getElementById("RecursoAlvo");
+  const descricao = document.getElementById("RecursoDescricao");
 
   const request = {
     "token": token,
     "recurso_id": id,
-    "recurso_alvo": alvo.value
+    "recurso_alvo": alvo.value,
+    "descricao": descricao.value
   };
 
   const newId = await post("/ativo", request);
 
   if (newId){
 
-    if (!ativos.includes(newId)){
-      ativos.push(newId);
+    if (!ativos[newId]){
+      ativos[newId] = request;
       alvo.value = "";
+      descricao.value = "";
+      preencheOptionsAtivos(ativaRecursoSection);
       alert("Sucesso");
     } else {
       alert("Recurso já foi ativado");
@@ -128,13 +137,13 @@ async function desativaRecurso(event) {
   event.preventDefault();
 
   const desativaRecursoSection = document.getElementById("desativaRecursoSection");
-  const desativaRecursoList = desativaRecursoSection.querySelector('[name="RecursoList"]');
+  const desativaRecursoList = desativaRecursoSection.querySelector('[name="AtivoList"]');
   const id = desativaRecursoList.value;
 
   const deleted = await del(`/ativo/${id}`);
 
   if (deleted){
-    ativos = ativos.filter( (ativoId) => ativoId != id );
+    delete ativos[id]
     preencheOptionsAtivos(desativaRecursoSection);
     alert("Sucesso");
   } else {
@@ -218,6 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     desativaRecursoSection.classList.add("hidden");
 
     preencheOptionsRecursos(ativaRecursoSection);
+    preencheOptionsAtivos(ativaRecursoSection);
   });
 
   // Desativar recurso
