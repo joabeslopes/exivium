@@ -42,6 +42,8 @@ O sistema foi projetado para suportar módulos independentes, chamados de "Recur
 
 É recomendado utilizar o Docker para rodar o sistema. Para isso, basta ir na raiz do projeto e rodar **docker compose up -d** que ele já vai construir a imagem do backend, e também rodar o banco de dados e o nginx para servir o frontend.
 
+Na pasta **nginx** você deve criar o arquivo **nginx.conf** para definir as configurações dele. Você pode copiar o arquivo **nginx.conf.template** e renomeá-lo, pois esse template já tem o necessário para a aplicação funcionar de forma simples.
+
 Na pasta **backend** você deve criar os arquivos **exivium.log** e **.env** e definir nesse arquivo .env algumas variáveis de ambiente que serão usadas pelos containers, como por exemplo:
 
 >FPS=30
